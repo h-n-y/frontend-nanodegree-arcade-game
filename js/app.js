@@ -11,6 +11,12 @@ CELL_WIDTH = 101;
 CELL_HEIGHT = 83;
 
 /*
+ *  Offsets Entity sprite image on canvas in order to correctly align
+ *  it vertically with the row the Entity occupies.
+ */
+var SPRITE_Y_POSITION_ADJUST = -20;
+
+/*
  * ENTITY: Base class for Enemy and Player
  *
  * Properties:
@@ -36,11 +42,18 @@ Entity.prototype._draw = function() {
   var x = this.location.x * CELL_WIDTH;
   var y = this.location.y * CELL_HEIGHT;
 
-  ctx.drawImage(this.sprite, x, y);
+  ctx.drawImage(Resources.get(this.sprite), x, y + SPRITE_Y_POSITION_ADJUST);
+
 }
 //  Begins the process of rendering the Entity's sprite onscreen.
 Entity.prototype.render = function() {
-  draw();
+  this._draw();
+}
+// Updates any data or properties associated with the Entity.
+// Initiated by the game loop and called continuously.
+// Default functionality is to do nothing;
+Entity.prototype.update = function() {
+  // noop
 }
 
 
@@ -99,7 +112,7 @@ Player.prototype._draw = function() {
   // TODO: draw any equipment / costumes on top of the player sprite
 };
 Player.prototype.render = function() {
-  draw();
+  this._draw();
 };
 Player.prototype.handleInput = function() {
 
@@ -108,11 +121,15 @@ Player.prototype.handleInput = function() {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-var player, allEnemies;
+var player, allEnemies = [];
 function init() {
-  player = new Player('../images/char-boy.png', 2, 4);
+  player = new Player('images/char-boy.png', 2, 4);
 
-  // create 
+  // create two enemies
+  var enemy1 = new Enemy('images/enemy-bug.png', 0, 5);
+  var enemy2 = new Enemy('images/enemy-bug.png', 2, 1);
+  allEnemies.push(enemy1);
+  allEnemies.push(enemy2);
 }
 
 
@@ -128,3 +145,5 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+init();
