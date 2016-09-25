@@ -1,6 +1,10 @@
 // This file contains definitions for obstacles that in some way
 // impede Player or Enemy objects' movement across the board.
 //
+// Obstacle class constructors can be accessed globally through
+// the Obstacle object.
+//    (i.e. var myRock = new Obstacle.rock() )
+//
 // Summary:
 //  - Rock:   _solid_ impassable obstacle.
 //  - Web:    _sticky_ obstacle.
@@ -102,6 +106,15 @@ var OBSTACLE_TYPE = {
     this.y = y;
     this.SPRITE_URL_LEFT_LASERNODE = 'images/laser-left.png';
     this.SPRITE_URL_RIGHT_LASERNODE = 'images/laser-right.png';
+  };
+  Laser.prototype = Object.create(Obstacle.prototype);
+  Laser.prototype.constructor = Laser;
+
+  // Allow global access to the Rock, Web, and Laser classes.
+  window.Obstacles = {
+    rock: Rock,
+    web: Web,
+    laser: Laser
   };
 
 }());
