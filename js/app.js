@@ -118,30 +118,36 @@ Player.prototype.render = function() {
   this._draw();
 };
 Player.prototype.handleInput = function(key) {
+  var proposedLocation;
+
   switch ( key ) {
     case 'left':
-    var canMoveLeft = this.location.x > 0;
+    proposedLocation = { x: this.location.x - 1, y: this.location.y };
+    var canMoveLeft = this.location.x > 0 && BoardManager.playerCanOccupyLocation(proposedLocation);
     if ( canMoveLeft ) {
       --this.location.x;
     }
     break;
 
     case 'right':
-    var canMoveRight = this.location.x < numCols - 1;
+    proposedLocation = { x: this.location.x + 1, y: this.location.y };
+    var canMoveRight = this.location.x < numCols - 1 && BoardManager.playerCanOccupyLocation(proposedLocation);
     if ( canMoveRight ) {
       ++this.location.x;
     }
     break;
 
     case 'up':
-    var canMoveUp = this.location.y > 0;
+    proposedLocation = { x: this.location.x, y: this.location.y - 1 };
+    var canMoveUp = this.location.y > 0 && BoardManager.playerCanOccupyLocation(proposedLocation);
     if ( canMoveUp ) {
       --this.location.y;
     }
     break;
 
     case 'down':
-    var canMoveDown = this.location.y < numRows - 1;
+    proposedLocation = { x: this.location.x, y: this.location.y + 1 };
+    var canMoveDown = this.location.y < numRows - 1 && BoardManager.playerCanOccupyLocation(proposedLocation);
     if ( canMoveDown ) {
       ++this.location.y;
     }

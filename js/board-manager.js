@@ -71,6 +71,8 @@
    *
    *  Methods:
    *    *  renderBoard: Renders the game board and all obstacles to the canvas
+   *    *  playerCanOccupyLocation: Returns true iff player is allowed to move
+   *    *     into the location given by the argument.
    *
    *    * _renderRows: Helper method for renderBoard; renders the board's rows
    *    * _renderObstacles: Helper method for renderBoard; renders the board's obstacles
@@ -81,6 +83,45 @@
     this.currentLevel = 0;
     this._rowMap       = new _RowMap();
     this._obstacleMap  = new _ObstacleMap();
+  };
+  BoardManager.prototype.playerCanOccupyLocation = function(location) {
+    var allObstacles, rocks, lasers;
+    allObstacles = this._obstacleLayout();
+
+    // Prevent player from moving into a location occupied by a rock.
+    rocks = allObstacles.filter(rocksOnly);
+    var rock;
+    for ( var i = 0; i < rocks.length; ++i ) {
+      rock = rocks[i];
+
+      if ( location.x === rock.location.x &&
+           location.y === rock.location.y ) {
+             return false;
+           }
+    }
+
+    // Prevent player from moving into a location occupied by a
+    // laser node.
+    // lasers = allObstacles.filter(lasersOnly);
+    // var laser;
+    // for ( var i = 0; i < lasers.length; ++i ) {
+    //   laser = lasers[i]
+    //
+    //
+    // }
+
+    return true;
+
+    // Filter function to remove all non-rock obstacles from
+    // allObstacles array.
+    function rocksOnly(obstacle) {
+      return obstacle.type === OBSTACLE_TYPE.rock;
+    }
+    // Filter function to remove all non-laser obstacles from
+    // allObstacles array.
+    function lasersOnly(obstacle) {
+      return obstacle.type === OBSTACLE_TYPE.laser;
+    }
   };
   BoardManager.prototype.renderBoard = function() {
     this._renderRows();
@@ -93,7 +134,7 @@
     // Draw the rows
     for ( var row = 0; row < numRows; ++row ) {
       for ( var col = 0; col < numCols; ++col ) {
-        ctx.drawImage(Resources.get(rowImages[row]), col * CELL_WIDTH, row * CELL_HEIGHT);
+        ctx.drawImage(Resources.get(rowImageURLs[row]), col * CELL_WIDTH, row * CELL_HEIGHT);
       }
     }
   }

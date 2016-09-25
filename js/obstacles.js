@@ -21,7 +21,8 @@ var COLOR = {
 
 var OBSTACLE_TYPE = {
   rock: "rock",
-  web: "web"
+  web: "web",
+  laser: "laser"
 };
 
 (function() {
@@ -73,7 +74,7 @@ var OBSTACLE_TYPE = {
         default:
         spriteURL = "images/Rock.png";
       }
-      
+
       return spriteURL;
     }
   };
