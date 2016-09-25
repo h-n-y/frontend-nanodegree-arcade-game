@@ -51,20 +51,6 @@
   var _ObstacleMap = function() {
 
   };
-  _ObstacleMap.prototype.spriteURLForObstacleType = function(type) {
-    var spriteURL = "";
-
-    switch ( type ) {
-      case OBSTACLE_TYPE.rock:
-      spriteURL = "images/Rock.png";
-      break;
-
-      default:
-      console.warn("WARNING: Obstacle type ( " + type + " ) is invalid.");
-    }
-
-    return spriteURL;
-  };
   _ObstacleMap.prototype.level1 = function() {
     var obstacles = [
       new Obstacles.rock(COLOR.gray, 2, 3)
