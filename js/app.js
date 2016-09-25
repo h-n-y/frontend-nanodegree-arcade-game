@@ -52,7 +52,7 @@ Entity.prototype.render = function() {
 // Updates any data or properties associated with the Entity.
 // Initiated by the game loop and called continuously.
 // Default functionality is to do nothing;
-Entity.prototype.update = function() {
+Entity.prototype.update = function(dt) {
   // noop
 }
 
