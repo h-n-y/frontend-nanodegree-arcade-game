@@ -74,6 +74,7 @@ var Engine = (function(global) {
     function init() {
         reset();
         lastTime = Date.now();
+        BoardManager.currentLevel = 1;
         main();
     }
 
@@ -112,39 +113,46 @@ var Engine = (function(global) {
      * they are just drawing the entire screen over and over.
      */
     function render() {
-        /* This array holds the relative URL to the image used
-         * for that particular row of the game level.
-         */
-        var rowImages = [
-                'images/water-block.png',   // Top row is water
-                'images/stone-block.png',   // Row 1 of 3 of stone
-                'images/stone-block.png',   // Row 2 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/grass-block.png',   // Row 1 of 2 of grass
-                'images/grass-block.png'    // Row 2 of 2 of grass
-            ],
-            //numRows = 6,
-            //numCols = 5,
-            row, col;
-
-        /* Loop through the number of rows and columns we've defined above
-         * and, using the rowImages array, draw the correct image for that
-         * portion of the "grid"
-         */
-        for (row = 0; row < numRows; row++) {
-            for (col = 0; col < numCols; col++) {
-                /* The drawImage function of the canvas' context element
-                 * requires 3 parameters: the image to draw, the x coordinate
-                 * to start drawing and the y coordinate to start drawing.
-                 * We're using our Resources helpers to refer to our images
-                 * so that we get the benefits of caching these images, since
-                 * we're using them over and over.
-                 */
-                ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
-            }
-        }
-
+        renderRows();
+        renderObstacles();
         renderEntities();
+    }
+
+    function renderRows() {
+      /* This array holds the relative URL to the image used
+       * for that particular row of the game level.
+       */
+      var rowImages = BoardManager.rowLayout();
+
+      /* Loop through the number of rows and columns we've defined above
+       * and, using the rowImages array, draw the correct image for that
+       * portion of the "grid"
+       */
+      for (var row = 0; row < numRows; row++) {
+          for (var col = 0; col < numCols; col++) {
+              /* The drawImage function of the canvas' context element
+               * requires 3 parameters: the image to draw, the x coordinate
+               * to start drawing and the y coordinate to start drawing.
+               * We're using our Resources helpers to refer to our images
+               * so that we get the benefits of caching these images, since
+               * we're using them over and over.
+               */
+              ctx.drawImage(Resources.get(rowImages[row]), col * CELL_WIDTH, row * CELL_HEIGHT);
+          }
+      }
+    }
+
+    function renderObstacles() {
+      var obstacles = BoardManager.obstacleLayout();
+      var image, x, y;
+
+      obstacles.forEach(function(obstacle) {
+        image = Resources.get(obstacle.spriteURL);
+        x = obstacle.location.x * CELL_WIDTH;
+        y = obstacle.location.y * CELL_HEIGHT + SPRITE_Y_POSITION_ADJUST;
+
+        ctx.drawImage(image, x, y);
+      });
     }
 
     /* This function is called by the render function and is called on each game
@@ -179,7 +187,8 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/Rock.png'
     ]);
     Resources.onReady(init);
 

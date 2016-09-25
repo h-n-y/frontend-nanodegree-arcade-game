@@ -40,22 +40,41 @@
   };
 
   /*
-   * _OBSTACLEMAP: Provides a complete description of the locations of
-   * obstacles for every level.
+   *  _OBSTACLEMAP: Provides a complete description of the locations of
+   *  obstacles for every level.
+   *
+   *  Methods:
+   *    - spriteURLForObstacleType: Returns the corresponding sprite url for
+   *        the given obstacle type.
    */
   var _ObstacleMap = function() {
 
   };
+  _ObstacleMap.prototype.spriteURLForObstacleType = function(type) {
+    var spriteURL = "";
+
+    switch ( type ) {
+      case OBSTACLE_TYPE.rock:
+      spriteURL = "images/Rock.png";
+      break;
+
+      default:
+      console.warn("WARNING: Obstacle type ( " + type + " ) is invalid.");
+    }
+
+    return spriteURL;
+  };
   _ObstacleMap.prototype.level1 = function() {
-    var obstacles = {
+    var obstacles = [
       {
         type: OBSTACLE_TYPE.rock,
+        spriteURL: this.spriteURLForObstacleType(OBSTACLE_TYPE.rock),
         location: {
           x: 2,
           y: 3
         }
       }
-    };
+    ];
     return obstacles;
   };
 
@@ -87,7 +106,7 @@
       break;
 
       default:
-      console.log("WARNING: currentLevel ( " + this.currentLevel + " ) is not a valid level.");
+      console.warn("WARNING: currentLevel ( " + this.currentLevel + " ) is not a valid level.");
       rowLayout = [];
     }
 
@@ -101,7 +120,7 @@
       break;
 
       default:
-      console.log("WARNING: currentLevel ( " + this.currentLevel + " ) is not a valid level.");
+      console.warn("WARNING: currentLevel ( " + this.currentLevel + " ) is not a valid level.");
       obstacleLayout = {};
     }
 
