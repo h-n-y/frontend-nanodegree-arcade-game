@@ -63,23 +63,54 @@
    *  of the current level during the render and update stages.
    *
    *  Properties:
-   *    - currentLevel: the current level of the game
-   *    - _rowMap: provides row layout information for the
+   *    * currentLevel: the current level of the game
+   *    * _rowMap: provides row layout information for the
    *              levels
-   *    - _obstacleMap: provides obstacle layout information for the
+   *    * _obstacleMap: provides obstacle layout information for the
    *                   levels
    *
    *  Methods:
-   *    - rowLayout: Returns the row layout for the current level
-   *    - obstacleLayout: Returns the obstacle layout for the current level
+   *    *  renderBoard: Renders the game board and all obstacles to the canvas
+   *
+   *    * _renderRows: Helper method for renderBoard; renders the board's rows
+   *    * _renderObstacles: Helper method for renderBoard; renders the board's obstacles
+   *    * _rowLayout: Returns the row layout for the current level
+   *    * _obstacleLayout: Returns the obstacle layout for the current level
    */
   var BoardManager = function() {
     this.currentLevel = 0;
     this._rowMap       = new _RowMap();
     this._obstacleMap  = new _ObstacleMap();
   };
-  BoardManager.prototype.rowLayout = function() {
+  BoardManager.prototype.renderBoard = function() {
+    this._renderRows();
+    this._renderObstacles();
+  };
+  BoardManager.prototype._renderRows = function() {
+    // Get image urls for all of the board's rows
+    var rowImageURLs = this._rowLayout();
+
+    // Draw the rows
+    for ( var row = 0; row < numRows; ++row ) {
+      for ( var col = 0; col < numCols; ++col ) {
+        ctx.drawImage(Resources.get(rowImages[row]), col * CELL_WIDTH, row * CELL_HEIGHT);
+      }
+    }
+  }
+  BoardManager.prototype._renderObstacles = function() {
+    // Get the board's obstacles
+    var obstacles = this._obstacleLayout();
+    var image, x, y;
+
+    // Draw the obstacles to the canvas
+    obstacles.forEach(function(obstacle) {
+      obstacle.render();
+    });
+  }
+  BoardManager.prototype._rowLayout = function() {
     var rowLayout;
+
+    // Get the row layout for the current level
     switch ( this.currentLevel ) {
       case 1:
       rowLayout = this._rowMap.level1();
@@ -92,8 +123,10 @@
 
     return rowLayout;
   };
-  BoardManager.prototype.obstacleLayout = function() {
+  BoardManager.prototype._obstacleLayout = function() {
     var obstacleLayout;
+
+    // Get the obstacle layout for the current level
     switch ( this.currentLevel ) {
       case 1:
       obstacleLayout = this._obstacleMap.level1();
