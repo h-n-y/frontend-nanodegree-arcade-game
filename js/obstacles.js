@@ -55,6 +55,8 @@ var OBSTACLE_TYPE = {
     this.color = color;
 
     function spriteURLForColor(color) {
+      var spriteURL;
+
       switch ( color ) {
         case COLOR.red:
         spriteURL = "images/rock-red.png";
@@ -69,8 +71,10 @@ var OBSTACLE_TYPE = {
         break;
 
         default:
-        spriteURL = "images/rock.png";
+        spriteURL = "images/Rock.png";
       }
+      
+      return spriteURL;
     }
   };
   Rock.prototype = Object.create(Obstacle.prototype);

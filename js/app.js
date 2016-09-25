@@ -29,7 +29,7 @@ var SPRITE_Y_POSITION_ADJUST = -20;
  *      and fifth row.
 */
 var Entity = function(spriteURL, x, y) {
-  this.sprite = spriteURL;
+  this.spriteURL = spriteURL;
   this.location = {
     x: x,
     y: y
@@ -42,7 +42,7 @@ Entity.prototype._draw = function() {
   var x = this.location.x * CELL_WIDTH;
   var y = this.location.y * CELL_HEIGHT;
 
-  ctx.drawImage(Resources.get(this.sprite), x, y + SPRITE_Y_POSITION_ADJUST);
+  ctx.drawImage(Resources.get(this.spriteURL), x, y + SPRITE_Y_POSITION_ADJUST);
 
 }
 //  Begins the process of rendering the Entity's sprite onscreen.

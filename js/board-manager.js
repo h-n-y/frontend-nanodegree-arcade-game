@@ -15,6 +15,7 @@
  *  Dependencies:
  *    - obstacles.js
  *      - for OBSTACLE_TYPE
+ *      - global Obstacles object
  */
 (function() {
 
@@ -66,14 +67,7 @@
   };
   _ObstacleMap.prototype.level1 = function() {
     var obstacles = [
-      {
-        type: OBSTACLE_TYPE.rock,
-        spriteURL: this.spriteURLForObstacleType(OBSTACLE_TYPE.rock),
-        location: {
-          x: 2,
-          y: 3
-        }
-      }
+      new Obstacles.rock(COLOR.gray, 2, 3)
     ];
     return obstacles;
   };
