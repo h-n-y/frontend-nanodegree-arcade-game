@@ -117,8 +117,39 @@ Player.prototype._draw = function() {
 Player.prototype.render = function() {
   this._draw();
 };
-Player.prototype.handleInput = function() {
+Player.prototype.handleInput = function(key) {
+  switch ( key ) {
+    case 'left':
+    var canMoveLeft = this.location.x > 0;
+    if ( canMoveLeft ) {
+      --this.location.x;
+    }
+    break;
 
+    case 'right':
+    var canMoveRight = this.location.x < numCols - 1;
+    if ( canMoveRight ) {
+      ++this.location.x;
+    }
+    break;
+
+    case 'up':
+    var canMoveUp = this.location.y > 0;
+    if ( canMoveUp ) {
+      --this.location.y;
+    }
+    break;
+
+    case 'down':
+    var canMoveDown = this.location.y < numRows - 1;
+    if ( canMoveDown ) {
+      ++this.location.y;
+    }
+    break;
+
+    default:
+      // do nothing
+  }
 };
 
 // Now instantiate your objects.

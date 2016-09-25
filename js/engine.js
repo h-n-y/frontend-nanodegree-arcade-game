@@ -14,6 +14,14 @@
  * a little simpler to work with.
  */
 
+// The number of rows and columns on the board.
+// These have been made global so the Player object can access
+// them when handling user input.
+ var numRows, numCols;
+ numRows = 6;
+ numCols = 5;
+
+
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
@@ -115,8 +123,8 @@ var Engine = (function(global) {
                 'images/grass-block.png',   // Row 1 of 2 of grass
                 'images/grass-block.png'    // Row 2 of 2 of grass
             ],
-            numRows = 6,
-            numCols = 5,
+            //numRows = 6,
+            //numCols = 5,
             row, col;
 
         /* Loop through the number of rows and columns we've defined above
