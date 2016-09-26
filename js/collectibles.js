@@ -24,16 +24,24 @@
   // Updates the vertical positioning of this _Collectible to make
   // it appear to float up and down.
   _Collectible.prototype.update = function(dt) {
-    var dy, maxDY;
+    var dy, maxDY, frequencyControl;
 
     // Use a sin function to oscillate dy from [-maxDY, maxDY]
-    maxDY = 10;
-    dy = maxDY * Math.sin(Date.now())
-    this.location.y = centralYLocation + dy;
+    // maxDY and frequencyControl were chosen subjectively
+    maxDY = 0.1;
+    frequencyControl = 800
+    dy = maxDY * Math.sin(Date.now() / frequencyControl)
+    this.location.y = this.centralYLocation + dy;
+  };
+  _Collectible.prototype.render = function() {
+    var x, y;
+    x = this.location.x * CELL_WIDTH;
+    y = this.location.y * CELL_HEIGHT + SPRITE_Y_POSITION_ADJUST;
+    ctx.drawImage(Resources.get(this.spriteURL), x, y);
   };
 
   /*
-   * CANDY: Represents a piece of candy the player is trying to acquire.
+   *  CANDY: Represents a piece of candy the player is trying to acquire.
    *
    *  Class Hierarchy: Object > Entity > _Collectible > Candy
    */

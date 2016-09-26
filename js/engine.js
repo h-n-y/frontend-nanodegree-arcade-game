@@ -89,6 +89,7 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
+        updateCollectibles(dt);
         // checkCollisions();
     }
 
@@ -106,6 +107,10 @@ var Engine = (function(global) {
         player.update();
     }
 
+    function updateCollectibles(dt) {
+      BoardManager.updateCollectibles(dt);
+    }
+
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
      * game tick (or loop of the game engine) because that's how games work -
@@ -115,6 +120,7 @@ var Engine = (function(global) {
     function render() {
         renderBoard();
         renderEntities();
+        renderCollectibles();
     }
 
     function renderBoard() {
@@ -134,6 +140,10 @@ var Engine = (function(global) {
         });
 
         player.render();
+    }
+
+    function renderCollectibles() {
+      BoardManager.renderCollectibles();
     }
 
     /* This function does nothing but it could have been a good place to
@@ -164,9 +174,9 @@ var Engine = (function(global) {
         'images/rock-yellow.png',
         'images/Rock.png',
 
-        'images/dwarf-red',
-        'images/dwarf-blue',
-        'images/dwarf-yellow',
+        'images/dwarf-red.png',
+        'images/dwarf-blue.png',
+        'images/dwarf-yellow.png',
     ]);
     Resources.onReady(init);
 

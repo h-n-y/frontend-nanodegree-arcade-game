@@ -40,9 +40,9 @@ var Entity = function(spriteURL, x, y) {
 Entity.prototype._draw = function() {
   // Get the origin for drawing
   var x = this.location.x * CELL_WIDTH;
-  var y = this.location.y * CELL_HEIGHT;
+  var y = this.location.y * CELL_HEIGHT + SPRITE_Y_POSITION_ADJUST;
 
-  ctx.drawImage(Resources.get(this.spriteURL), x, y + SPRITE_Y_POSITION_ADJUST);
+  ctx.drawImage(Resources.get(this.spriteURL), x, y);
 
 }
 //  Begins the process of rendering the Entity's sprite onscreen.

@@ -43,10 +43,6 @@
   /*
    *  _OBSTACLEMAP: Provides a complete description of the locations of
    *  obstacles for every level.
-   *
-   *  Methods:
-   *    - spriteURLForObstacleType: Returns the corresponding sprite url for
-   *        the given obstacle type.
    */
   var _ObstacleMap = function() {
 
@@ -59,34 +55,52 @@
   };
 
   /*
+   *  _COLLECTIBLEMAP: Provides a complete description of the locations of
+   *  collectibles for every level.
+   */
+  var _CollectibleMap = function() {
+
+  };
+  _CollectibleMap.prototype.level1 = function() {
+    var collectibles = [
+      new Costume.laserman(COLOR.red, 0, 4)
+    ];
+    return collectibles;
+  };
+
+  /*
    *  BOARDMANAGER: Provides relevant information about the design layout
    *  of the current level during the render and update stages.
    *
    *  Properties:
    *    * currentLevel: the current level of the game
    *    * _rowMap: provides row layout information for the
-   *              levels
-   *    * _obstacleMap: provides obstacle layout information for the
-   *                   levels
+   *               levels
    *
    *  Methods:
    *    *  renderBoard: Renders the game board and all obstacles to the canvas
    *    *  playerCanOccupyLocation: Returns true iff player is allowed to move
    *    *     into the location given by the argument.
+   *    *  updateCollectibles: updates the vertical position of each collectible
+   *    *  renderCollectibles: renders the collectibles to the canvas
    *
-   *    * _renderRows: Helper method for renderBoard; renders the board's rows
-   *    * _renderObstacles: Helper method for renderBoard; renders the board's obstacles
-   *    * _rowLayout: Returns the row layout for the current level
-   *    * _obstacleLayout: Returns the obstacle layout for the current level
+   *    * _renderRows:         Helper method for renderBoard; renders the board's rows
+   *    * _renderObstacles:    Helper method for renderBoard; renders the board's obstacles
+   *    * _renderCollectibles: Helper method for renderBoard; renders the board's collectibles
+   *    * _rowLayout:          Returns the row layout for the current level
+   *    * _initialObstacleLayout:     Returns the obstacle layout for the current level
+   *    * _initialCollectibleLayout: Returns the initial collectibles layout for the current level
    */
   var BoardManager = function() {
-    this.currentLevel = 0;
-    this._rowMap       = new _RowMap();
-    this._obstacleMap  = new _ObstacleMap();
+    this.currentLevel             = 1;
+    this.currentObstacleLayout    = this._initialObstacleLayout();
+    this.currentCollectibleLayout = this._initialCollectibleLayout();
+
+    this._rowMap                  = new _RowMap();
   };
   BoardManager.prototype.playerCanOccupyLocation = function(location) {
     var allObstacles, rocks, lasers;
-    allObstacles = this._obstacleLayout();
+    allObstacles = this.currentObstacleLayout;
 
     // Prevent player from moving into a location occupied by a rock.
     rocks = allObstacles.filter(rocksOnly);
@@ -100,6 +114,7 @@
            }
     }
 
+    // TODO: implement laser node testing
     // Prevent player from moving into a location occupied by a
     // laser node.
     // lasers = allObstacles.filter(lasersOnly);
@@ -123,9 +138,22 @@
       return obstacle.type === OBSTACLE_TYPE.laser;
     }
   };
+  BoardManager.prototype.updateCollectibles = function(dt) {
+
+    this.currentCollectibleLayout.forEach(function(collectible) {
+      collectible.update();
+    });
+  };
+  BoardManager.prototype.renderCollectibles = function() {
+
+    this.currentCollectibleLayout.forEach(function(collectible) {
+      collectible.render();
+    });
+  };
   BoardManager.prototype.renderBoard = function() {
     this._renderRows();
     this._renderObstacles();
+    this._renderCollectibles();
   };
   BoardManager.prototype._renderRows = function() {
     // Get image urls for all of the board's rows
@@ -139,15 +167,19 @@
     }
   }
   BoardManager.prototype._renderObstacles = function() {
-    // Get the board's obstacles
-    var obstacles = this._obstacleLayout();
-    var image, x, y;
 
     // Draw the obstacles to the canvas
-    obstacles.forEach(function(obstacle) {
+    this.currentObstacleLayout.forEach(function(obstacle) {
       obstacle.render();
     });
   }
+  BoardManager.prototype._renderCollectibles = function() {
+
+    // Draw the collectibles to the canvas
+    this.currentCollectibleLayout.forEach(function(collectible) {
+      collectible.render();
+    });
+  };
   BoardManager.prototype._rowLayout = function() {
     var rowLayout;
 
@@ -164,22 +196,40 @@
 
     return rowLayout;
   };
-  BoardManager.prototype._obstacleLayout = function() {
-    var obstacleLayout;
+  BoardManager.prototype._initialObstacleLayout = function() {
+    var obstacleMap, initialObstacleLayout;
+    obstacleMap = new _ObstacleMap();
 
     // Get the obstacle layout for the current level
     switch ( this.currentLevel ) {
       case 1:
-      obstacleLayout = this._obstacleMap.level1();
+      initialObstacleLayout = obstacleMap.level1();
       break;
 
       default:
       console.warn("WARNING: currentLevel ( " + this.currentLevel + " ) is not a valid level.");
-      obstacleLayout = {};
+      initialObstacleLayout = {};
     }
 
-    return obstacleLayout;
+    return initialObstacleLayout;
   }
+  BoardManager.prototype._initialCollectibleLayout = function() {
+    var collectibleMap, initialCollectibleLayout;
+    collectibleMap = new _CollectibleMap();
+
+    // Get the collectibles layout for the current level
+    switch ( this.currentLevel ) {
+      case 1:
+      initialCollectibleLayout = collectibleMap.level1();
+      break;
+
+      default:
+      console.warn("WARNING: currentLevel ( " + this.currentLevel + " ) is not a valid level");
+      initialCollectibleLayout = {};
+    }
+
+    return initialCollectibleLayout;
+  };
 
   // Make BoardManager available globally
   window.BoardManager = new BoardManager();
