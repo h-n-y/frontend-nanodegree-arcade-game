@@ -182,12 +182,6 @@
       collectible.update();
     });
   };
-  BoardManager.prototype.renderCostumes = function() {
-
-    this.currentCostumeLayout.forEach(function(collectible) {
-      collectible.render();
-    });
-  };
   BoardManager.prototype.renderBoard = function() {
     this._renderRows();
     this._renderObstacles();

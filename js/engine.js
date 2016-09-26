@@ -120,7 +120,6 @@ var Engine = (function(global) {
     function render() {
         renderBoard();
         renderEntities();
-        renderCostumes();
     }
 
     function renderBoard() {
@@ -142,9 +141,6 @@ var Engine = (function(global) {
         player.render();
     }
 
-    function renderCostumes() {
-      BoardManager.renderCostumes();
-    }
 
     /* This function does nothing but it could have been a good place to
      * handle game reset states - maybe a new game menu or a game over screen
