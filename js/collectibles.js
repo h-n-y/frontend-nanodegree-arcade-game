@@ -29,8 +29,8 @@
     // Use a sin function to oscillate dy from [-maxDY, maxDY]
     // maxDY and frequencyControl were chosen subjectively
     maxDY = 0.1;
-    frequencyControl = 800
-    dy = maxDY * Math.sin(Date.now() / frequencyControl)
+    frequencyControl = 800;
+    dy = maxDY * Math.sin(Date.now() / frequencyControl);
     this.location.y = this.centralYLocation + dy;
   };
   _Collectible.prototype.render = function() {
