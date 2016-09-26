@@ -1,6 +1,14 @@
 // Dependencies:
 //  obstacles.js
 //    for COLOR
+
+var COSTUME_TYPE = {
+  laserman: "laserman",
+  ghost: "ghost",
+  dwarf: "dwarf"
+};
+
+
 (function() {
 
   /*
@@ -10,13 +18,15 @@
    *  Class Hierarchy: Object > Entity > _Collectible
    *
    *  Properties:
-   *    * centralYLocation: the starting y-position of the _Collectible.
+   *    * originalYLocation: the starting y-position of the _Collectible.
    *        _Collectibles float up and down and oscillate vertically about this
    *        position.
+   *    * type: a string from the global COLLECTIBLE_TYPE object
    */
-  var _Collectible = function(spriteURL, x, y) {
+  var _Collectible = function(type, spriteURL, x, y) {
     Entity.call(this, spriteURL, x, y);
-    this.centralYLocation = this.location.y;
+    this.type = type;
+    this.originalYLocation = this.location.y;
   };
   _Collectible.prototype = Object.create(Entity.prototype);
   _Collectible.prototype.constructor = _Collectible;
@@ -31,12 +41,13 @@
     maxDY = 0.1;
     frequencyControl = 800;
     dy = maxDY * Math.sin(Date.now() / frequencyControl);
-    this.location.y = this.centralYLocation + dy;
+    this.location.y = this.originalYLocation + dy;
   };
   _Collectible.prototype.render = function() {
     var x, y;
     x = this.location.x * CELL_WIDTH;
     y = this.location.y * CELL_HEIGHT + SPRITE_Y_POSITION_ADJUST;
+
     ctx.drawImage(Resources.get(this.spriteURL), x, y);
   };
 
@@ -47,7 +58,7 @@
    */
   var Candy = function(x, y) {
     // TODO: change spriteURL!
-    _Collectible.call(this, 'images/enemy-bug.png', x, y);
+    _Collectible.call(this, COLLECTIBLE_TYPE.candy, 'images/enemy-bug.png', x, y);
   };
   Candy.prototype = Object.create(_Collectible.prototype);
   Candy.prototype.constructor = Candy;
@@ -65,10 +76,12 @@
    *  Properties:
    *    * color: the color of the costume
    *        - LaserMan is only invulnerable to lasers of the same color
+   *    * spriteURL: the url string for the image representing Laserman
    */
   var LaserMan = function(color, x, y) {
     var spriteURL = spriteURLForColor(color);
-    _Collectible.call(this, spriteURL, x, y);
+    _Collectible.call(this, COSTUME_TYPE.laserman, spriteURL, x, y);
+    this.spriteURL = spriteURL;
     this.color = color;
 
     function spriteURLForColor(color) {
@@ -110,10 +123,12 @@
    *  Properties:
    *    * color: the color of the costume
    *        - Dwarf can only smash rocks of the same color
+   *    * spriteURL: a url string for the image representing a Dwarf
    */
   var Dwarf = function(color, x, y) {
     var spriteURL = spriteURLForColor(color);
-    _Collectible.call(this, spriteURL, x, y);
+    _Collectible.call(this, COSTUME_TYPE.dwarf, spriteURL, x, y);
+    this.spriteURL = spriteURL;
     this.color = color;
 
     function spriteURLForColor(color) {
@@ -142,8 +157,16 @@
   Dwarf.prototype = Object.create(_Collectible.prototype);
   Dwarf.prototype.constructor = Dwarf;
 
+  /*
+   * GHOST: A collectible costume that lets the player walk in the spirit world!
+   *        - makes the user impervious to ghosts
+   *
+   *  Parameters:
+   *    * spriteURL: a url string for the image representing a Ghost
+   */
   var Ghost = function(x, y) {
-    _Collectible.call(this, 'images/ghost-costume.png', x, y);
+    _Collectible.call(this, COSTUME_TYPE.ghost, 'images/ghost-costume.png', x, y);
+    this.spriteURL = 'images/ghost-costume.png';
   };
   Ghost.prototype = Object.create(_Collectible.prototype);
   Ghost.prototype.constructor = Ghost;

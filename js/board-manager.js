@@ -58,12 +58,14 @@
    *  _COLLECTIBLEMAP: Provides a complete description of the locations of
    *  collectibles for every level.
    */
-  var _CollectibleMap = function() {
+  var _CostumeMap = function() {
 
   };
-  _CollectibleMap.prototype.level1 = function() {
+  _CostumeMap.prototype.level1 = function() {
     var collectibles = [
-      new Costume.laserman(COLOR.red, 0, 4)
+      new Costume.laserman(COLOR.red, 0, 4),
+      new Costume.ghost(0, 1),
+      new Costume.dwarf(COLOR.blue, 3, 1)
     ];
     return collectibles;
   };
@@ -74,6 +76,10 @@
    *
    *  Properties:
    *    * currentLevel: the current level of the game
+   *    * currentObstacleLayout: array with information about how obstacles are laid out
+   *        on the game board
+   *    * currentCostumeLayout: array with information about how costumes are laid
+   *        out on the game board
    *    * _rowMap: provides row layout information for the
    *               levels
    *
@@ -81,20 +87,25 @@
    *    *  renderBoard: Renders the game board and all obstacles to the canvas
    *    *  playerCanOccupyLocation: Returns true iff player is allowed to move
    *    *     into the location given by the argument.
-   *    *  updateCollectibles: updates the vertical position of each collectible
-   *    *  renderCollectibles: renders the collectibles to the canvas
+   *    *  updateCostumes: updates the vertical position of each collectible
+   *    *  renderCostumes: renders the collectibles to the canvas
+   *    *  updateBoardForNewPlayerLocation: conditionally updates the board after player
+   *          has moved to a new location. Checks if the player has
+   *            - picked up a Candy to complete the level,
+   *            - picked up a costume, or
+   *            - run into an obstacle
    *
    *    * _renderRows:         Helper method for renderBoard; renders the board's rows
    *    * _renderObstacles:    Helper method for renderBoard; renders the board's obstacles
-   *    * _renderCollectibles: Helper method for renderBoard; renders the board's collectibles
+   *    * _renderCostumes: Helper method for renderBoard; renders the board's collectibles
    *    * _rowLayout:          Returns the row layout for the current level
    *    * _initialObstacleLayout:     Returns the obstacle layout for the current level
-   *    * _initialCollectibleLayout: Returns the initial collectibles layout for the current level
+   *    * _initialCostumeLayout: Returns the initial collectibles layout for the current level
    */
   var BoardManager = function() {
     this.currentLevel             = 1;
     this.currentObstacleLayout    = this._initialObstacleLayout();
-    this.currentCollectibleLayout = this._initialCollectibleLayout();
+    this.currentCostumeLayout     = this._initialCostumeLayout();
 
     this._rowMap                  = new _RowMap();
   };
@@ -138,22 +149,49 @@
       return obstacle.type === OBSTACLE_TYPE.laser;
     }
   };
-  BoardManager.prototype.updateCollectibles = function(dt) {
 
-    this.currentCollectibleLayout.forEach(function(collectible) {
+  BoardManager.prototype.updateBoardForNewPlayerLocation = function(location) {
+
+      // Check if player has picked up the Candy to complete the level
+      // TODO
+
+      // Check if player has picked up a new costume
+      var costume;
+      for ( var i = 0; i < this.currentCostumeLayout.length; ++i ) {
+        costume = this.currentCostumeLayout[i];
+
+        // Check if player picked up this costume
+        var playerPickedUpCostume = location.x === costume.location.x && location.y === costume.originalYLocation;
+        if ( playerPickedUpCostume ) {
+          // Remove costume from the board
+          this.currentCostumeLayout.splice(i, 1);
+
+          // Add costume to player
+          player.costumes.push(costume);
+
+          break;
+        }
+      }
+
+      // Check if player has run into an obstacle
+      // TODO
+  };
+  BoardManager.prototype.updateCostumes = function(dt) {
+
+    this.currentCostumeLayout.forEach(function(collectible) {
       collectible.update();
     });
   };
-  BoardManager.prototype.renderCollectibles = function() {
+  BoardManager.prototype.renderCostumes = function() {
 
-    this.currentCollectibleLayout.forEach(function(collectible) {
+    this.currentCostumeLayout.forEach(function(collectible) {
       collectible.render();
     });
   };
   BoardManager.prototype.renderBoard = function() {
     this._renderRows();
     this._renderObstacles();
-    this._renderCollectibles();
+    this._renderCostumes();
   };
   BoardManager.prototype._renderRows = function() {
     // Get image urls for all of the board's rows
@@ -173,10 +211,10 @@
       obstacle.render();
     });
   }
-  BoardManager.prototype._renderCollectibles = function() {
+  BoardManager.prototype._renderCostumes = function() {
 
     // Draw the collectibles to the canvas
-    this.currentCollectibleLayout.forEach(function(collectible) {
+    this.currentCostumeLayout.forEach(function(collectible) {
       collectible.render();
     });
   };
@@ -213,9 +251,9 @@
 
     return initialObstacleLayout;
   }
-  BoardManager.prototype._initialCollectibleLayout = function() {
+  BoardManager.prototype._initialCostumeLayout = function() {
     var collectibleMap, initialCollectibleLayout;
-    collectibleMap = new _CollectibleMap();
+    collectibleMap = new _CostumeMap();
 
     // Get the collectibles layout for the current level
     switch ( this.currentLevel ) {

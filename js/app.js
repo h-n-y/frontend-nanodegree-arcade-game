@@ -100,9 +100,18 @@ Enemy.prototype.update = function(dt) {
  *
  *  Class Hierarchy: Object > Entity > Player
  *
+ *  Properties:
+ *    * costumes: an array that holds Costume objects the player
+ *        is wearing
+ *
+ *  Methods:
+ *    * _isGhost: Returns true iff player is wearing a Ghost costume
+ *    * _isDwarf: Returns true iff player is wearing a Dwarf costume
+ *    * _isLaserMan: Returns true iff player is wearing a LaserMan costume
  */
 var Player = function(spriteURL, x, y) {
   Entity.call(this, spriteURL, x, y);
+  this.costumes = [];
 }
 Player.prototype = Object.create(Entity.prototype);
 Player.prototype.constructor = Player;
@@ -112,49 +121,114 @@ Player.prototype._draw = function() {
   // Call superclass implementation
   Entity.prototype._draw.call(this);
 
-  // TODO: draw any equipment / costumes on top of the player sprite
+  // Draw any costumes Player is wearing
+
+  if ( this.costumes.length === 0 ) return;
+  var x, y;
+  x = this.location.x * CELL_WIDTH;
+  y = this.location.y * CELL_HEIGHT + SPRITE_Y_POSITION_ADJUST;
+
+  // Check if player is a Ghost
+  if ( this._isGhost() ) {
+    var spriteURL = 'images/ghost-costume.png'
+    ctx.drawImage(Resources.get(spriteURL), x, y);
+  }
+
+  // Check if player is a Dwarf
+  if ( this._isDwarf() ) {
+    var dwarfCostume = this.costumes.find(function(costume) {
+      return costume.type === COSTUME_TYPE.dwarf;
+    });
+    ctx.drawImage(Resources.get(dwarfCostume.spriteURL), x, y);
+  }
+
+  // Check if player is LaserMan
+  if ( this._isLaserMan() ) {
+    var lasermanCostume = this.costumes.find(function(costume) {
+      return costume.type === COSTUME_TYPE.laserman;
+    });
+    ctx.drawImage(Resources.get(lasermanCostume.spriteURL), x, y);
+  }
+
+};
+Player.prototype._isGhost = function() {
+  return this.costumes.filter(function(costume) {
+    return costume.type === COSTUME_TYPE.ghost;
+  }).length > 0;
+};
+Player.prototype._isDwarf = function() {
+  return this.costumes.filter(function(costume) {
+    return costume.type === COSTUME_TYPE.dwarf;
+  }).length > 0;
+};
+Player.prototype._isLaserMan = function() {
+  return this.costumes.filter(function(costume) {
+    return costume.type === COSTUME_TYPE.laserman;
+  }).length > 0;
 };
 Player.prototype.render = function() {
   this._draw();
 };
-Player.prototype.handleInput = function(key) {
-  var proposedLocation;
+Player.prototype.handleInput = function(direction) {
+  // Attempt to move player
+  // NOTE: Do I'm not sure why I must use .call on this method?
+  // Not using .call makes `this` the Window object in the movePlayer function...
+  var playerMoved = movePlayer.call(this, direction);
+  if ( playerMoved ) {
+    // Now that the player has moved, the board ( may ) need to update.
+    // For example, if the player moved onto a block occupied by a collectible
+    // item, the board and the player need to reflect that.
+    BoardManager.updateBoardForNewPlayerLocation(this.location);
+  }
 
-  switch ( key ) {
-    case 'left':
-    proposedLocation = { x: this.location.x - 1, y: this.location.y };
-    var canMoveLeft = this.location.x > 0 && BoardManager.playerCanOccupyLocation(proposedLocation);
-    if ( canMoveLeft ) {
-      --this.location.x;
-    }
-    break;
+  // This function attempts to move player in the direction of the `direction`
+  // parameter.
+  // Returns: true iff player moved successfully; false otherwise
+  function movePlayer(direction) {
+    var proposedLocation, playerMoved;
+    playerMoved = false;
 
-    case 'right':
-    proposedLocation = { x: this.location.x + 1, y: this.location.y };
-    var canMoveRight = this.location.x < numCols - 1 && BoardManager.playerCanOccupyLocation(proposedLocation);
-    if ( canMoveRight ) {
-      ++this.location.x;
-    }
-    break;
+    switch ( direction ) {
+      case 'left':
+      proposedLocation = { x: this.location.x - 1, y: this.location.y };
+      var canMoveLeft = this.location.x > 0 && BoardManager.playerCanOccupyLocation(proposedLocation);
+      if ( canMoveLeft ) {
+        --this.location.x;
+        playerMoved = true;
+      }
+      break;
 
-    case 'up':
-    proposedLocation = { x: this.location.x, y: this.location.y - 1 };
-    var canMoveUp = this.location.y > 0 && BoardManager.playerCanOccupyLocation(proposedLocation);
-    if ( canMoveUp ) {
-      --this.location.y;
-    }
-    break;
+      case 'right':
+      proposedLocation = { x: this.location.x + 1, y: this.location.y };
+      var canMoveRight = this.location.x < numCols - 1 && BoardManager.playerCanOccupyLocation(proposedLocation);
+      if ( canMoveRight ) {
+        ++this.location.x;
+        playerMoved = true;
+      }
+      break;
 
-    case 'down':
-    proposedLocation = { x: this.location.x, y: this.location.y + 1 };
-    var canMoveDown = this.location.y < numRows - 1 && BoardManager.playerCanOccupyLocation(proposedLocation);
-    if ( canMoveDown ) {
-      ++this.location.y;
-    }
-    break;
+      case 'up':
+      proposedLocation = { x: this.location.x, y: this.location.y - 1 };
+      var canMoveUp = this.location.y > 0 && BoardManager.playerCanOccupyLocation(proposedLocation);
+      if ( canMoveUp ) {
+        --this.location.y;
+        playerMoved = true;
+      }
+      break;
 
-    default:
+      case 'down':
+      proposedLocation = { x: this.location.x, y: this.location.y + 1 };
+      var canMoveDown = this.location.y < numRows - 1 && BoardManager.playerCanOccupyLocation(proposedLocation);
+      if ( canMoveDown ) {
+        ++this.location.y;
+        playerMoved = true;
+      }
+      break;
+
+      default:
       // do nothing
+    }
+    return playerMoved;
   }
 };
 

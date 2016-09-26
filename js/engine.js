@@ -108,7 +108,7 @@ var Engine = (function(global) {
     }
 
     function updateCollectibles(dt) {
-      BoardManager.updateCollectibles(dt);
+      BoardManager.updateCostumes(dt);
     }
 
     /* This function initially draws the "game level", it will then call
@@ -120,7 +120,7 @@ var Engine = (function(global) {
     function render() {
         renderBoard();
         renderEntities();
-        renderCollectibles();
+        renderCostumes();
     }
 
     function renderBoard() {
@@ -142,8 +142,8 @@ var Engine = (function(global) {
         player.render();
     }
 
-    function renderCollectibles() {
-      BoardManager.renderCollectibles();
+    function renderCostumes() {
+      BoardManager.renderCostumes();
     }
 
     /* This function does nothing but it could have been a good place to
@@ -177,6 +177,8 @@ var Engine = (function(global) {
         'images/dwarf-red.png',
         'images/dwarf-blue.png',
         'images/dwarf-yellow.png',
+
+        'images/ghost-costume.png',
     ]);
     Resources.onReady(init);
 
