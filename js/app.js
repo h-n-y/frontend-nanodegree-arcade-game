@@ -105,6 +105,11 @@ Enemy.prototype.update = function(dt) {
  *        is wearing
  *
  *  Methods:
+ *    * canSmashRock(rock): Returns true iff player can smash `rock`.
+ *        A player can smash a rock if wearing a Dwarf costume with the
+ *        same color as the rock. ( i.e. A blue dwarf can smash blue rocks. )
+ *
+ *
  *    * _isGhost: Returns true iff player is wearing a Ghost costume
  *    * _isDwarf: Returns true iff player is wearing a Dwarf costume
  *    * _isLaserMan: Returns true iff player is wearing a LaserMan costume
@@ -115,6 +120,11 @@ var Player = function(spriteURL, x, y) {
 }
 Player.prototype = Object.create(Entity.prototype);
 Player.prototype.constructor = Player;
+Player.prototype.canSmashRock = function(rock) {
+  if ( this._isDwarf() ) {
+    return this._dwarfCostume().color === rock.color;
+  }
+};
 // Performs the actual work of drawing the Player and any worn
 // equipment onscreen.
 Player.prototype._draw = function() {
@@ -165,6 +175,20 @@ Player.prototype._isLaserMan = function() {
   return this.costumes.filter(function(costume) {
     return costume.type === COSTUME_TYPE.laserman;
   }).length > 0;
+};
+// Returns reference to player's Dwarf costume object or undefined
+// if player is not wearing a Dwarf costume.
+Player.prototype._dwarfCostume = function() {
+  return this.costumes.find(function(costume) {
+    return costume.type === COSTUME_TYPE.dwarf;
+  });
+};
+// Returns reference to player's LaserMan costume or undefined if
+// player is not wearing a LaserMan costume.
+Player.prototype._laserManCostume = function() {
+  return this.costumes.find(function(costume) {
+    return costume.type === COSTUME_TYPE.laserman;
+  });
 };
 Player.prototype.render = function() {
   this._draw();

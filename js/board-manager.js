@@ -49,7 +49,9 @@
   };
   _ObstacleMap.prototype.level1 = function() {
     var obstacles = [
-      new Obstacles.rock(COLOR.gray, 2, 3)
+      new Obstacles.rock(COLOR.red, 2, 3),
+      new Obstacles.rock(COLOR.yellow, 3, 3),
+      new Obstacles.rock(COLOR.blue, 4, 3)
     ];
     return obstacles;
   };
@@ -63,8 +65,8 @@
   };
   _CostumeMap.prototype.level1 = function() {
     var collectibles = [
-      new Costume.laserman(COLOR.red, 0, 4),
-      new Costume.ghost(0, 1),
+      new Costume.dwarf(COLOR.red, 2, 1),
+      new Costume.dwarf(COLOR.yellow, 1, 1),
       new Costume.dwarf(COLOR.blue, 3, 1)
     ];
     return collectibles;
@@ -114,14 +116,16 @@
     allObstacles = this.currentObstacleLayout;
 
     // Prevent player from moving into a location occupied by a rock.
-    rocks = allObstacles.filter(rocksOnly);
-    var rock;
+    var rocks, rock;
+    rocks = this._rockObstacles();
     for ( var i = 0; i < rocks.length; ++i ) {
       rock = rocks[i];
 
+      // If player is trying to move into a location occupied by a rock:
       if ( location.x === rock.location.x &&
            location.y === rock.location.y ) {
-             return false;
+
+             return player.canSmashRock(rock) ? true : false;
            }
     }
 
@@ -137,17 +141,6 @@
     // }
 
     return true;
-
-    // Filter function to remove all non-rock obstacles from
-    // allObstacles array.
-    function rocksOnly(obstacle) {
-      return obstacle.type === OBSTACLE_TYPE.rock;
-    }
-    // Filter function to remove all non-laser obstacles from
-    // allObstacles array.
-    function lasersOnly(obstacle) {
-      return obstacle.type === OBSTACLE_TYPE.laser;
-    }
   };
 
   BoardManager.prototype.updateBoardForNewPlayerLocation = function(location) {
@@ -174,7 +167,60 @@
       }
 
       // Check if player has run into an obstacle
-      // TODO
+      var obstacle = this._obstacleAtLocation(location);
+      if ( !obstacle ) return;
+
+      switch ( obstacle.type ) {
+        case OBSTACLE_TYPE.rock:
+        handleRockCollision.call(this);
+        break;
+
+        case OBSTACLE_TYPE.laser:
+        handleLaserCollision.call(this);
+        break;
+
+        case OBSTACLE_TYPE.web:
+        handleWebCollision.call(this);
+        break;
+
+      }
+
+      // The player has smashed the rock.
+      // Remove the rock from the board and animate its destruction.
+      function handleRockCollision() {
+        // Rename for clarity
+        var rock = obstacle;
+
+        // Remove rock
+        var rockIndex = this.currentObstacleLayout.findIndex(function(obstacle) {
+          return obstacle.location.x === rock.location.x && obstacle.location.y === rock.location.y;
+        });
+        this.currentObstacleLayout.splice(rockIndex, 1);
+
+        // Animate rock destruction
+        // TODO
+      }
+
+      function handleLaserCollision() {
+
+      }
+
+      function handleWebCollision() {
+
+      }
+
+      // // Check if player has run into a colored rock
+      // var rocks, rock;
+      // rocks = this._rockObstacles();
+      // for ( var i = 0; i < rocks.length; ++i ) {
+      //   rock = rocks[i];
+      //
+      //   var playerRanIntoRock = location.x === rock.location.x && location.y === rock.location.y;
+      //   if ( playerRanIntoRock ) {
+      //     // Remove rock from the board
+      //
+      //   }
+      // }
   };
   BoardManager.prototype.updateCostumes = function(dt) {
 
@@ -262,6 +308,24 @@
 
     return initialCollectibleLayout;
   };
+  // Returns all of the rock obstacles currently on the board.
+  BoardManager.prototype._rockObstacles = function() {
+    return this.currentObstacleLayout.filter(function(obstacle) {
+      return obstacle.type === OBSTACLE_TYPE.rock;
+    })
+  };
+  // Returns all of the laser obstacles currently on the board.
+  BoardManager.prototype._laserObstacles = function() {
+    return this.currentObstacleLayout.filter(function(obstacle) {
+      return obstacle.type === OBSTACLE_TYPE.laser;
+    });
+  };
+  // Returns the object at location or undefined if no such object exists.
+  BoardManager.prototype._obstacleAtLocation = function(location) {
+    return this.currentObstacleLayout.find(function(obstacle) {
+      return obstacle.location.x === location.x && obstacle.location.y === location.y;
+    });
+  }
 
   // Make BoardManager available globally
   window.BoardManager = new BoardManager();
