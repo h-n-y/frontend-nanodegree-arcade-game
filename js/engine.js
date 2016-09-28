@@ -90,6 +90,7 @@ var Engine = (function(global) {
     function update(dt) {
         updateEntities(dt);
         updateCollectibles(dt);
+        updateAnimations(dt);
         // checkCollisions();
     }
 
@@ -111,6 +112,12 @@ var Engine = (function(global) {
       BoardManager.updateCostumes(dt);
     }
 
+    // Updates any current finite animations such as rock-smashing
+    // animations.
+    function updateAnimations(dt) {
+      AnimationQueue.update(dt);
+    }
+
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
      * game tick (or loop of the game engine) because that's how games work -
@@ -120,10 +127,17 @@ var Engine = (function(global) {
     function render() {
         renderBoard();
         renderEntities();
+        renderAnimations();
     }
 
     function renderBoard() {
       BoardManager.renderBoard();
+    }
+
+    // Renders any current finite animations ( like rock-smashing ) to
+    // the canvas
+    function renderAnimations() {
+      AnimationQueue.render();
     }
 
     /* This function is called by the render function and is called on each game

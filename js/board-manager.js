@@ -16,6 +16,7 @@
  *    - obstacles.js
  *      - for OBSTACLE_TYPE
  *      - global Obstacles object
+ *    - animations.js
  */
 (function() {
 
@@ -50,8 +51,8 @@
   _ObstacleMap.prototype.level1 = function() {
     var obstacles = [
       new Obstacles.rock(COLOR.red, 2, 3),
-      new Obstacles.rock(COLOR.yellow, 3, 3),
-      new Obstacles.rock(COLOR.blue, 4, 3)
+      new Obstacles.rock(COLOR.red, 3, 3),
+      new Obstacles.rock(COLOR.red, 4, 3)
     ];
     return obstacles;
   };
@@ -198,7 +199,8 @@
         this.currentObstacleLayout.splice(rockIndex, 1);
 
         // Animate rock destruction
-        // TODO
+        var animation = new Animation.rockSmash(rock.color, location.x, location.y);
+        AnimationQueue.addAnimation(animation);
       }
 
       function handleLaserCollision() {
@@ -208,19 +210,6 @@
       function handleWebCollision() {
 
       }
-
-      // // Check if player has run into a colored rock
-      // var rocks, rock;
-      // rocks = this._rockObstacles();
-      // for ( var i = 0; i < rocks.length; ++i ) {
-      //   rock = rocks[i];
-      //
-      //   var playerRanIntoRock = location.x === rock.location.x && location.y === rock.location.y;
-      //   if ( playerRanIntoRock ) {
-      //     // Remove rock from the board
-      //
-      //   }
-      // }
   };
   BoardManager.prototype.updateCostumes = function(dt) {
 
