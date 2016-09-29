@@ -120,21 +120,31 @@ var OBSTACLE_TYPE = {
       return;
     }
 
+    this._renderLaserBeam();
+    this._renderLaserNodes();
+  };
+  Laser.prototype._renderLaserBeam = function() {
     var x, y, verticalAdjustment;
 
-    verticalAdjustment = SPRITE_Y_POSITION_ADJUST + 25;
+    verticalAdjustment = SPRITE_Y_POSITION_ADJUST + 105;
 
     // Draw laser beam
     var laserbeamWidth, laserbeamHeight;
     ctx.save();
     ctx.fillStyle = "blue";
     x = ( this.locationLeftLaserNode + 0.75 ) * CELL_WIDTH;
-    y = this.y * CELL_HEIGHT + verticalAdjustment + 80;
+    y = this.y * CELL_HEIGHT + verticalAdjustment;
     laserbeamWidth = ( this.locationRightLaserNode - this.locationLeftLaserNode - 0.5 ) * CELL_WIDTH;
     laserbeamHeight = 20;
     ctx.fillRect(x, y, laserbeamWidth, laserbeamHeight);
 
     ctx.restore();
+  };
+  Laser.prototype._renderLaserNodes = function() {
+
+    var x, y, verticalAdjustment;
+
+    verticalAdjustment = SPRITE_Y_POSITION_ADJUST + 25;
 
     // Draw left laser node
     x = this.locationLeftLaserNode * CELL_WIDTH;
