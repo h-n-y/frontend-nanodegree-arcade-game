@@ -29,7 +29,7 @@ var OBSTACLE_TYPE = {
 
   /*
    *  OBSTACLE: Represents an obstacle Enemy and Player instances generally
-   *  cannot pass through ( easily ).
+   *  cannot pass through.
    *
    *  Class Hierarchy: Object > Entity > Obstacle
    */
@@ -44,7 +44,7 @@ var OBSTACLE_TYPE = {
    *  ROCK: A solid obstacle through which Enemy and Player instances
    *  cannot pass.
    *
-   *  Colored rocks ( red, blue, and yellow ) can be broken by a hammer
+   *  Colored rocks ( red, blue, and yellow ) can be broken by a Dwarf
    *  of the same color;
    *
    *  Class Hierarchy: Object > Entity > Obstacle > Rock
@@ -100,7 +100,7 @@ var OBSTACLE_TYPE = {
    *
    *  Class Hierarchy: Object > Entity > Obstacle > Laser
    */
-  var Laser = function(locationLeft, locationRight, y) {
+  var Laser = function(color, locationLeft, locationRight, y) {
     // Intentionally omit arguments for spriteURL, x, y. These arguments
     // are not amenable to Laser because it requires *two* sprites and
     // *two* locations in order to be placed on the board.
@@ -114,6 +114,38 @@ var OBSTACLE_TYPE = {
   };
   Laser.prototype = Object.create(Obstacle.prototype);
   Laser.prototype.constructor = Laser;
+  Laser.prototype.render = function() {
+    if ( this.locationLeftLaserNode.x !== this.locationRightLaserNode.x ) {
+      console.warn("WARNING: Laser's nodes are not on the same row - will not render.");
+      return;
+    }
+
+    var x, y, verticalAdjustment;
+
+    verticalAdjustment = SPRITE_Y_POSITION_ADJUST + 25;
+
+    // Draw laser beam
+    var laserbeamWidth, laserbeamHeight;
+    ctx.save();
+    ctx.fillStyle = "blue";
+    x = ( this.locationLeftLaserNode + 0.75 ) * CELL_WIDTH;
+    y = this.y * CELL_HEIGHT + verticalAdjustment + 80;
+    laserbeamWidth = ( this.locationRightLaserNode - this.locationLeftLaserNode - 0.5 ) * CELL_WIDTH;
+    laserbeamHeight = 20;
+    ctx.fillRect(x, y, laserbeamWidth, laserbeamHeight);
+
+    ctx.restore();
+
+    // Draw left laser node
+    x = this.locationLeftLaserNode * CELL_WIDTH;
+    y = this.y * CELL_HEIGHT + verticalAdjustment;
+    ctx.drawImage(Resources.get(this.SPRITE_URL_LEFT_LASERNODE), x, y);
+
+    // Draw right laser node
+    x = this.locationRightLaserNode * CELL_WIDTH;
+    y = this.y * CELL_HEIGHT + verticalAdjustment;
+    ctx.drawImage(Resources.get(this.SPRITE_URL_RIGHT_LASERNODE), x, y);
+  };
 
   // Allow global access to the Rock, Web, and Laser classes.
   window.Obstacles = {

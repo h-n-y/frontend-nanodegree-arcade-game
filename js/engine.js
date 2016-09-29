@@ -189,6 +189,9 @@ var Engine = (function(global) {
         'images/dwarf-yellow.png',
 
         'images/ghost-costume.png',
+
+        'images/laser-left.png',
+        'images/laser-right.png'
     ]);
     Resources.onReady(init);
 
