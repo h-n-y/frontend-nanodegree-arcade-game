@@ -126,8 +126,8 @@ var Engine = (function(global) {
      */
     function render() {
         renderBoard();
-        renderEntities();
         renderAnimations();
+        renderEntities();
     }
 
     function renderBoard() {

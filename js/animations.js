@@ -53,6 +53,10 @@
    *      animation when contained inside an AnimationQueue.
    *    animationQueue: Reference to the animation queue containing this animation
    *    complete: A flag that marks whether or not this animation has completed
+   *
+   *  Methods:
+   *    _checkForCompletion(): Checks if this animation is complete, and removes it from
+   *        its animation queue if it is.
    */
   var Animation = function(x, y) {
     Entity.call(this, null, x, y);
@@ -62,6 +66,16 @@
   };
   Animation.prototype = Object.create(Entity.prototype);
   Animation.prototype.constructor = Animation;
+  Animation.prototype._checkForCompletion = function() {
+    // If animation has complete, remove it from the animation queue
+    if ( this.complete ) {
+      var id = this.id;
+      var animationIndex = this.animationQueue.animations.findIndex(function(animation) {
+        return animation.id === id;
+      });
+      this.animationQueue.animations.splice(animationIndex, 1);
+    }
+  };
 
   /*
    *  RockSmash: Animates the smashing of a colored rock by the player.
@@ -77,13 +91,21 @@
    *    color: the color of the rock being smashed
    *    animationOrigin: The position within the cell where the particle animations
    *        originate
+   *    particles: an array storing the animating particle objects that are drawn to the canvas
    *
    *  Public Methods:
    *    perform(): executes the animation
+   *    update(): updates the properties of the animating particles
+   *    render(): renders the animation to the canvas 
    */
   var RockSmash = function(color, x, y) {
     Animation.call(this, x, y);
-    this.color = color;
+    this.color = {
+      name: color,
+      stroke: "",
+      fill: ""
+    };
+    this._setColor(color);
     this.animationOrigin = {
       x: ( this.location.x + 0.5 ) * CELL_WIDTH,
       y: ( this.location.y + 0.5 ) * CELL_HEIGHT + SPRITE_Y_POSITION_ADJUST + 70
@@ -105,11 +127,66 @@
           this.alpha = Math.max(0, this.alpha - 4 * dt);
           this.rotation += 2 * Math.PI * dt;
         }
+      }, {
+        location: {
+          x: this.animationOrigin.x,
+          y: this.animationOrigin.y
+        },
+        width: 80,
+        alpha: 1.0,
+        rotation: 0,
+        speed: 2,
+        update: function(dt) {
+          var ds = this.speed * dt;
+          this.location.x += 50 * ds;
+          this.location.y += 20 * ds;
+          this.alpha = Math.max(0, this.alpha - 3 * dt);
+          this.rotation += Math.PI * dt;
+        }
+      }, {
+        location: {
+          x: this.animationOrigin.x,
+          y: this.animationOrigin.y
+        },
+        width: 60,
+        alpha: 1.0,
+        rotation: 0,
+        speed: 10,
+        update: function(dt) {
+          var ds = this.speed * dt;
+          this.location.x -= 5 * ds;
+          this.location.y -= 20 * ds;
+          this.alpha = Math.max(0, this.alpha - 2 * dt);
+          this.rotation += 3 * Math.PI * dt;
+        }
       }
     ];
   };
   RockSmash.prototype = Object.create(Animation.prototype);
   RockSmash.prototype.constructor = RockSmash;
+  RockSmash.prototype._setColor = function(color) {
+    switch ( color ) {
+      case COLOR.red:
+      this.color.stroke = "rgba(241, 70, 70, %alpha%)";
+      this.color.fill = "rgba(89, 7, 7, %alpha%)";
+      break;
+
+      case COLOR.yellow:
+      this.color.stroke = "rgba(244, 227, 106, %alpha%)";
+      this.color.fill = "rgba(183, 161, 14, %alpha%)";
+      break;
+
+      case COLOR.blue:
+      this.color.fill = "rgba(6, 53, 83, %alpha%)";
+      this.color.stroke = "rgba(26, 156, 237, %alpha%)";
+      break;
+
+      default:
+      console.warn("WARNING: " + color + " is not a valid color.");
+      this.color.fill = "black";
+      this.color.stroke = "white";
+    }
+  };
   RockSmash.prototype.update = function(dt) {
     var animationComplete = false;
     this.particles.forEach(function(particle) {
@@ -122,15 +199,24 @@
   };
   RockSmash.prototype.render = function() {
     ctx.save();
+    ctx.lineWidth = 20;
 
+    var self = this;
     this.particles.forEach(function(particle) {
       ctx.save();
-      ctx.fillStyle = "rgba(255, 0, 0, " + particle.alpha + ")";
 
+      // Set style
+      ctx.fillStyle = self.color.fill.replace("%alpha%", particle.alpha);
+      ctx.strokeStyle = self.color.stroke.replace("%alpha%", particle.alpha);
+
+      // Set transform
       ctx.translate(particle.location.x, particle.location.y);
       ctx.rotate(particle.rotation);
-      ctx.fillRect(-particle.width / 2, -particle.width / 2, particle.width, particle.width);
-      //ctx.strokeRect(-particle.width / 2, -particle.width / 2, particle.width, particle.width);
+
+      // Draw particle
+      var halfWidth = particle.width / 2;
+      ctx.fillRect(-halfWidth, -halfWidth, particle.width, particle.width);
+      ctx.strokeRect(-halfWidth, -halfWidth, particle.width, particle.width);
 
       ctx.restore();
     });
@@ -138,16 +224,7 @@
 
     this._checkForCompletion();
   };
-  RockSmash.prototype._checkForCompletion = function() {
-    // If animation has complete, remove it from the animation queue
-    if ( this.complete ) {
-      var id = this.id;
-      var animationIndex = this.animationQueue.animations.findIndex(function(animation) {
-        return animation.id === id;
-      });
-      this.animationQueue.animations.splice(animationIndex, 1);
-    }
-  };
+
 
   // Make AnimationQueue and animations available globally
   window.AnimationQueue = new AnimationQueue();

@@ -50,9 +50,9 @@
   };
   _ObstacleMap.prototype.level1 = function() {
     var obstacles = [
-      new Obstacles.rock(COLOR.red, 2, 3),
-      new Obstacles.rock(COLOR.red, 3, 3),
-      new Obstacles.rock(COLOR.red, 4, 3)
+      new Obstacles.rock(COLOR.blue, 2, 3),
+      new Obstacles.rock(COLOR.blue, 3, 3),
+      new Obstacles.rock(COLOR.blue, 4, 3)
     ];
     return obstacles;
   };
