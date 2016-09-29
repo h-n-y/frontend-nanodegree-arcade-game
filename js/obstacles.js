@@ -106,6 +106,11 @@ var OBSTACLE_TYPE = {
     // *two* locations in order to be placed on the board.
     Obstacle.call(this, OBSTACLE_TYPE.laser);
 
+    this.beamColor = {
+      name: color,
+      rgb: ""
+    };
+    this._setBeamColor(color);
     this.locationLeftLaserNode = locationLeft;
     this.locationRightLaserNode = locationRight;
     this.y = y;
@@ -125,17 +130,23 @@ var OBSTACLE_TYPE = {
   };
   Laser.prototype._renderLaserBeam = function() {
     var x, y, verticalAdjustment;
-
     verticalAdjustment = SPRITE_Y_POSITION_ADJUST + 105;
 
     // Draw laser beam
     var laserbeamWidth, laserbeamHeight;
     ctx.save();
+
+
     ctx.fillStyle = "blue";
     x = ( this.locationLeftLaserNode + 0.75 ) * CELL_WIDTH;
     y = this.y * CELL_HEIGHT + verticalAdjustment;
     laserbeamWidth = ( this.locationRightLaserNode - this.locationLeftLaserNode - 0.5 ) * CELL_WIDTH;
     laserbeamHeight = 20;
+
+    var gradient = ctx.createLinearGradient(x, y, x, y + laserbeamHeight);
+    gradient.addColorStop(0, "white");
+    gradient.addColorStop(1, this.beamColor.rgb);
+    ctx.fillStyle = gradient;
     ctx.fillRect(x, y, laserbeamWidth, laserbeamHeight);
 
     ctx.restore();
@@ -155,6 +166,25 @@ var OBSTACLE_TYPE = {
     x = this.locationRightLaserNode * CELL_WIDTH;
     y = this.y * CELL_HEIGHT + verticalAdjustment;
     ctx.drawImage(Resources.get(this.SPRITE_URL_RIGHT_LASERNODE), x, y);
+  };
+  Laser.prototype._setBeamColor = function(color) {
+    switch ( color ) {
+      case COLOR.red:
+      this.beamColor.rgb = "rgb(241, 70, 70)";
+      break;
+
+      case COLOR.yellow:
+      this.beamColor.rgb = "rgb(244, 227, 106)";
+      break;
+
+      case COLOR.blue:
+      this.beamColor.rgb = "rgb(26, 156, 237)";
+      break;
+
+      default:
+      console.warn("WARNING: " + color + " is not a valid color.");
+      this.beamColor.rgb = "black";
+    }
   };
 
   // Allow global access to the Rock, Web, and Laser classes.
