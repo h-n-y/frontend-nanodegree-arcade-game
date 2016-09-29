@@ -133,13 +133,16 @@
     // TODO: implement laser node testing
     // Prevent player from moving into a location occupied by a
     // laser node.
-    // lasers = allObstacles.filter(lasersOnly);
-    // var laser;
-    // for ( var i = 0; i < lasers.length; ++i ) {
-    //   laser = lasers[i]
-    //
-    //
-    // }
+    var lasers, laser;
+    lasers = this._laserObstacles();
+    for ( var i = 0; i < lasers.length; ++i ) {
+      laser = lasers[i];
+
+      if ( location.x === laser.locationLeftLaserNode && location.y === laser.y ||
+            location.x === laser.locationRightLaserNode && location.y === laser.y ) {
+              return false;
+            }
+    }
 
     return true;
   };
