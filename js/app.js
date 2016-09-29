@@ -113,10 +113,13 @@ Enemy.prototype.update = function(dt) {
  *    * _isGhost: Returns true iff player is wearing a Ghost costume
  *    * _isDwarf: Returns true iff player is wearing a Dwarf costume
  *    * _isLaserMan: Returns true iff player is wearing a LaserMan costume
+ *    * _laserShieldAnimation: Reference to the laser shield surrounding the player
+ *          while passing through a laser with the LaserMan costume.
  */
 var Player = function(spriteURL, x, y) {
   Entity.call(this, spriteURL, x, y);
   this.costumes = [];
+  this._laserShieldAnimation = null;
 }
 Player.prototype = Object.create(Entity.prototype);
 Player.prototype.constructor = Player;
@@ -192,6 +195,20 @@ Player.prototype._laserManCostume = function() {
 };
 Player.prototype.render = function() {
   this._draw();
+};
+Player.prototype.startLaserShieldAnimation = function() {
+
+  var animation = new Animation.laserShield(this._laserManCostume().color, this.location.x, this.location.y);
+  AnimationQueue.addAnimation(animation);
+
+  this._laserShieldAnimation = animation;
+  this.laserShieldIsOn = true;
+};
+Player.prototype.endLaserShieldAnimation = function() {
+  if ( this._laserShieldAnimation !== null ) {
+    this._laserShieldAnimation.complete = true;
+    this.laserShieldIsOn = false;
+  }
 };
 Player.prototype.handleInput = function(direction) {
   // Attempt to move player

@@ -51,7 +51,7 @@
   _ObstacleMap.prototype.level1 = function() {
     var obstacles = [
       new Obstacles.rock(COLOR.blue, 2, 3),
-      new Obstacles.laser(COLOR.blue, 0, 4, 2)
+      new Obstacles.laser(COLOR.yellow, 0, 4, 2)
 
     ];
     return obstacles;
@@ -66,9 +66,10 @@
   };
   _CostumeMap.prototype.level1 = function() {
     var collectibles = [
-      new Costume.dwarf(COLOR.red, 2, 1),
+      //new Costume.dwarf(COLOR.red, 2, 1),
       new Costume.dwarf(COLOR.yellow, 1, 1),
-      new Costume.dwarf(COLOR.blue, 3, 1)
+      new Costume.dwarf(COLOR.blue, 3, 1),
+      new Costume.laserman(COLOR.yellow, 2, 1)
     ];
     return collectibles;
   };
@@ -149,6 +150,8 @@
 
   BoardManager.prototype.updateBoardForNewPlayerLocation = function(location) {
 
+    player.endLaserShieldAnimation();
+
       // Check if player has picked up the Candy to complete the level
       // TODO
 
@@ -173,6 +176,7 @@
       // Check if player has run into an obstacle
       var obstacle = this._obstacleAtLocation(location);
       if ( !obstacle ) return;
+
 
       switch ( obstacle.type ) {
         case OBSTACLE_TYPE.rock:
@@ -206,8 +210,22 @@
         AnimationQueue.addAnimation(animation);
       }
 
+      // Player has run into a laser beam.
+      // If player is wearing a LaserMan costume matching laser's color, player can
+      // pass through. Otherwise, the player 'dies' and the level starts over.
       function handleLaserCollision() {
+        // rename for clarity
+        var laser = obstacle;
 
+        var playerInvulnerableToLaser = ( player._isLaserMan() && player._laserManCostume().color ===  laser.beamColor.name );
+        if ( playerInvulnerableToLaser/* && !player.laserShieldIsOn*/ ) {
+          // Start laser shield animation around player
+          player.endLaserShieldAnimation();
+          player.startLaserShieldAnimation();
+        }
+
+        // Player is vulnerable to laser and dies. Start level over.
+        // TODO
       }
 
       function handleWebCollision() {
@@ -315,6 +333,13 @@
   // Returns the object at location or undefined if no such object exists.
   BoardManager.prototype._obstacleAtLocation = function(location) {
     return this.currentObstacleLayout.find(function(obstacle) {
+      if ( obstacle.type === OBSTACLE_TYPE.laser ) {
+        // Check if location is occupied by a laser beam
+        return (  location.x < obstacle.locationRightLaserNode &&
+                  location.x > obstacle.locationLeftLaserNode &&
+                  location.y === obstacle.y );
+      }
+
       return obstacle.location.x === location.x && obstacle.location.y === location.y;
     });
   }

@@ -96,7 +96,7 @@
    *  Public Methods:
    *    perform(): executes the animation
    *    update(): updates the properties of the animating particles
-   *    render(): renders the animation to the canvas 
+   *    render(): renders the animation to the canvas
    */
   var RockSmash = function(color, x, y) {
     Animation.call(this, x, y);
@@ -226,10 +226,138 @@
   };
 
 
+  /*
+   * LaserShield: Animation for the shield that surrounds the player while
+   *      that player is passing throught a laser beam in a LaserMan costume.
+   */
+  var LaserShield = function(color, x, y) {
+    Animation.call(this, x, y);
+    this._setColor(color);
+    this.animationOrigin = {
+      x: ( this.location.x + 0.5 ) * CELL_WIDTH,
+      y: ( this.location.y + 0.5 ) * CELL_HEIGHT + SPRITE_Y_POSITION_ADJUST + 70
+    };
+    this.particles = {
+      backgroundCircle: {
+        radius: 70,
+        alpha: 0.8,
+        color: this.color.dark,
+        update: function(dt) {
+          // noop
+        }
+      },
+      expandingCircle: {
+        radius: 0, // 0 --> large
+        lineWidth: 20, // large --> 0
+        alpha: 1,
+        speed: 100,
+        color: this.color.light,
+        update: function(dt) {
+          var ds = this.speed * dt;
+          this.radius = Math.min(100, this.radius + ds);
+          this.lineWidth = Math.max(0, this.lineWidth - 0.5 * ds);
+
+          // Start animation over
+          if ( this.radius === 100 || this.lineWidth === 0 ) {
+            this.radius = 0;
+            this.lineWidth = 20;
+          }
+        }
+      },
+      orbitingParticle: {
+        radius: 45,
+        width: 8,
+        color: "white",
+        rotation: 0,
+        speed: 2,
+        update: function(dt) {
+          var ds = this.speed * dt;
+          this.rotation += 2 * Math.PI * ds;
+        }
+      }
+    }
+  };
+  LaserShield.prototype = Object.create(Animation.prototype);
+  LaserShield.prototype.constructor = LaserShield;
+  LaserShield.prototype.update = function(dt) {
+    this.particles.backgroundCircle.update(dt);
+    this.particles.expandingCircle.update(dt);
+    this.particles.orbitingParticle.update(dt);
+  };
+  LaserShield.prototype.render = function() {
+    ctx.save();
+
+    // Render background circle
+    var circle, color, alpha, radius;
+    circle = this.particles.backgroundCircle;
+    radius = circle.radius;
+    alpha = circle.alpha;
+    color = circle.color.replace("%alpha%", alpha);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(this.animationOrigin.x, this.animationOrigin.y, radius, 0, 2 * Math.PI);
+    //ctx.stroke();
+    ctx.fill();
+
+    // Render expanding circle
+    circle = this.particles.expandingCircle;
+    radius = circle.radius;
+    alpha = circle.alpha;
+    color = circle.color.replace("%alpha%", alpha);
+    lineWidth = circle.lineWidth;
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = color;
+    ctx.beginPath();
+    ctx.arc(this.animationOrigin.x, this.animationOrigin.y, radius, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    // Render orbiting particle
+    var orbitingParticle = this.particles.orbitingParticle;
+    radius = orbitingParticle.radius;
+    ctx.lineWidth = 4;
+    ctx.fillStyle = orbitingParticle.color;
+    ctx.translate(this.animationOrigin.x, this.animationOrigin.y);
+    ctx.rotate(orbitingParticle.rotation);
+    ctx.fillRect(-orbitingParticle.width/2, -orbitingParticle.width/2 - radius, orbitingParticle.width, orbitingParticle.width);
+
+    ctx.restore();
+
+    this._checkForCompletion();
+  };
+  LaserShield.prototype._setColor = function(color) {
+    this.color = {
+      name: color,
+      light: "",
+      dark: ""
+    };
+
+    switch ( color ) {
+      case COLOR.red:
+      this.color.light = "rgba(241, 70, 70, %alpha%)";
+      this.color.dark = "rgba(89, 7, 7, %alpha%)";
+      break;
+
+      case COLOR.yellow:
+      this.color.dark = "rgba(244, 227, 106, %alpha%)";
+      this.color.light = "rgba(183, 161, 14, %alpha%)";
+      break;
+
+      case COLOR.blue:
+      this.color.light = "rgba(26, 156, 237, %alpha%)";
+      this.color.dark = "rgba(6, 53, 83, %alpha%)";
+      break;
+
+      default:
+      console.warn("WARNING: " + color + " is not a valid color");
+    }
+  };
+
+
   // Make AnimationQueue and animations available globally
   window.AnimationQueue = new AnimationQueue();
   window.Animation = {
-    rockSmash: RockSmash
+    rockSmash: RockSmash,
+    laserShield: LaserShield
   };
 
 }());
