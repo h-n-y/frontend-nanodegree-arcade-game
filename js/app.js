@@ -109,15 +109,9 @@ Entity.prototype._collisionBoxIntersects = function(entity) {
       right: collisionBoxes.right.center.x + collisionBoxes.right.width / 2
     };
 
-    // var leftLaserNodeIntersected = ( thisRect.bottom >= leftNodeBox.top && thisRect.right >= leftNodeBox.left && thisRect.left <= leftNodeBox.right && thisRect.top <= leftNodeBox.bottom ) ||
-    //        ( leftNodeBox.bottom >= thisRect.top && leftNodeBox.right >= thisRect.left && leftNodeBox.left <= thisRect.right && leftNodeBox.top <= thisRect.bottom);
-    // var rightLaserNodeIntersected = ( thisRect.bottom >= rightNodeBox.top && thisRect.right >= rightNodeBox.left && thisRect.left <= rightNodeBox.right && thisRect.top <= leftNodeBox.bottom ) ||
-    //        ( rightNodeBox.bottom >= thisRect.top && rightNodeBox.right >= thisRect.left && rightNodeBox.left <= thisRect.right && thisRect.top <= rightNodeBox.bottom);
-
     var leftLaserNodeIntersected, rightLaserNodeIntersected;
     leftLaserNodeIntersected = ( thisRect.left <= leftNodeBox.right && thisRect.right >= leftNodeBox.left && thisRect.top <= leftNodeBox.bottom && thisRect.bottom >= leftNodeBox.top );
     rightLaserNodeIntersected = ( thisRect.left <= rightNodeBox.right && thisRect.right >= rightNodeBox.left && thisRect.top <= rightNodeBox.bottom && thisRect.bottom >= rightNodeBox.top );
-
 
     return ( leftLaserNodeIntersected || rightLaserNodeIntersected );
 
@@ -134,10 +128,8 @@ Entity.prototype._collisionBoxIntersects = function(entity) {
       right: collisionBox.center.x + halfWidth,
     };
 
+    // See: http://stackoverflow.com/questions/2752349/fast-rectangle-to-rectangle-intersection
     return ( thisRect.left <= thatRect.right && thisRect.right >= thatRect.left && thisRect.top <= thatRect.bottom && thisRect.bottom >= thatRect.top );
-
-    // return ( thisRect.bottom >= thatRect.top && thisRect.right >= thatRect.left && thisRect.left <= thatRect.right && thisRect.top <= thatRect.bottom) ||
-          //  ( thatRect.bottom >= thisRect.top && thatRect.right >= thisRect.left && thatRect.left <= thisRect.right && thatRect.top <= thisRect.bottom);
   }
 };
 Entity.prototype._renderCollisionBox = function() {
@@ -238,14 +230,27 @@ Enemy.prototype.checkCollisions = function() {
     return obstacle.type !== OBSTACLE_TYPE.web;
   });
 
+  // Check whether `this` has run into an obstacle
   var obstacle;
   for ( var i = 0; i < obstacles.length; ++i ) {
     obstacle = obstacles[i];
     if ( this.isCollidingWithEntity(obstacle) ) {
       this.isColliding = true;
+
+      // Change enemy direction after it 'hits' the obstacle
+      this._changeDirection();
       break;
     }
   }
+};
+// Causes the enemy to change directions.
+// Example: An enemy moving to the right will now move to the left.
+// This method is called after an enemy runs into an obstacle
+Enemy.prototype._changeDirection = function() {
+  // Ghosts don't change directions because they can pass through obstacles!
+  if ( this.type === ENEMY_TYPE.ghost ) return;
+
+  this.speed *= -1;
 };
 Enemy.prototype._spriteURLForType = function(type) {
   var spriteURL = '';
@@ -486,8 +491,10 @@ function init() {
   // create two enemies
   var enemy1 = new Enemy(ENEMY_TYPE.ghost, 0, 5, 1);
   var enemy2 = new Enemy(ENEMY_TYPE.spider, 1, 3, 0);
+  var movingSpider = new Enemy(ENEMY_TYPE.spider, 0, 5, 0.5);
   allEnemies.push(enemy1);
   allEnemies.push(enemy2);
+  allEnemies.push(movingSpider);
 }
 
 
