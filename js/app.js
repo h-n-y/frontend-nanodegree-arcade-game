@@ -16,6 +16,12 @@ CELL_HEIGHT = 83;
  */
 var SPRITE_Y_POSITION_ADJUST = -20;
 
+var ENEMY_TYPE = {
+  zombie: "zombie",
+  spider: "spider",
+  ghost: "ghost"
+};
+
 /*
  * ENTITY: Base class for Enemy and Player
  *
@@ -33,7 +39,16 @@ var Entity = function(spriteURL, x, y) {
   this.location = {
     x: x,
     y: y
-  }
+  };
+  this.collisionBox = {
+    width: 0,
+    height: 0,
+    center: {
+      x: 0,
+      y: 0
+    }
+  };
+  this.isColliding = false;
 }
 //  Called by Entity.render() to do the actual work of drawing
 //  the Entity's sprite onscreen.
@@ -48,6 +63,8 @@ Entity.prototype._draw = function() {
 //  Begins the process of rendering the Entity's sprite onscreen.
 Entity.prototype.render = function() {
   this._draw();
+  // for debugging only
+  this._renderCollisionBox();
 }
 // Updates any data or properties associated with the Entity.
 // Initiated by the game loop and called continuously.
@@ -55,6 +72,89 @@ Entity.prototype.render = function() {
 Entity.prototype.update = function(dt) {
   // noop
 }
+Entity.prototype.isCollidingWithEntity = function(entity) {
+  return this._collisionBoxIntersects(entity);
+};
+Entity.prototype._collisionBoxIntersects = function(entity) {
+  var thisRect, thatRect;
+  var collisionBox, halfWidth, halfHeight;
+
+  // Create collision box rect for `this`.
+  collisionBox = this.collisionBox;
+  halfWidth = collisionBox.width / 2;
+  halfHeight = collisionBox.height / 2;
+  thisRect = {
+    top: collisionBox.center.y - halfHeight,
+    bottom: collisionBox.center.y + halfHeight,
+    left: collisionBox.center.x - halfWidth,
+    right: collisionBox.center.x + halfWidth,
+  };
+
+  // If the entity argument is a laser obstacle, it has *two*
+  // collision boxes - one for each laser node. `this` is intersecting
+  // the laser if it intersects *either* one of its collision boxes
+  if ( entity.type === OBSTACLE_TYPE.laser ) {
+    var collisionBoxes, leftNodeBox, rightNodeBox;
+    collisionBoxes = entity.laserNodeCollisionBoxes;
+    leftNodeBox = {
+      top: collisionBoxes.left.center.y - collisionBoxes.left.height / 2,
+      bottom: collisionBoxes.left.center.y + collisionBoxes.left.height / 2,
+      left: collisionBoxes.left.center.x - collisionBoxes.left.width / 2,
+      right: collisionBoxes.left.center.x + collisionBoxes.left.width / 2
+    };
+    rightNodeBox = {
+      top: collisionBoxes.right.center.y - collisionBoxes.right.height / 2,
+      bottom: collisionBoxes.right.center.y + collisionBoxes.right.height / 2,
+      left: collisionBoxes.right.center.x - collisionBoxes.right.width / 2,
+      right: collisionBoxes.right.center.x + collisionBoxes.right.width / 2
+    };
+
+    // var leftLaserNodeIntersected = ( thisRect.bottom >= leftNodeBox.top && thisRect.right >= leftNodeBox.left && thisRect.left <= leftNodeBox.right && thisRect.top <= leftNodeBox.bottom ) ||
+    //        ( leftNodeBox.bottom >= thisRect.top && leftNodeBox.right >= thisRect.left && leftNodeBox.left <= thisRect.right && leftNodeBox.top <= thisRect.bottom);
+    // var rightLaserNodeIntersected = ( thisRect.bottom >= rightNodeBox.top && thisRect.right >= rightNodeBox.left && thisRect.left <= rightNodeBox.right && thisRect.top <= leftNodeBox.bottom ) ||
+    //        ( rightNodeBox.bottom >= thisRect.top && rightNodeBox.right >= thisRect.left && rightNodeBox.left <= thisRect.right && thisRect.top <= rightNodeBox.bottom);
+
+    var leftLaserNodeIntersected, rightLaserNodeIntersected;
+    leftLaserNodeIntersected = ( thisRect.left <= leftNodeBox.right && thisRect.right >= leftNodeBox.left && thisRect.top <= leftNodeBox.bottom && thisRect.bottom >= leftNodeBox.top );
+    rightLaserNodeIntersected = ( thisRect.left <= rightNodeBox.right && thisRect.right >= rightNodeBox.left && thisRect.top <= rightNodeBox.bottom && thisRect.bottom >= rightNodeBox.top );
+
+
+    return ( leftLaserNodeIntersected || rightLaserNodeIntersected );
+
+  } else {
+    // entity argument is *not* a laser, so just check if its single collision
+    // box rect intersects with `this`.
+    collisionBox = entity.collisionBox;
+    halfWidth = collisionBox.width / 2;
+    halfHeight = collisionBox.height / 2;
+    thatRect = {
+      top: collisionBox.center.y - halfHeight,
+      bottom: collisionBox.center.y + halfHeight,
+      left: collisionBox.center.x - halfWidth,
+      right: collisionBox.center.x + halfWidth,
+    };
+
+    return ( thisRect.left <= thatRect.right && thisRect.right >= thatRect.left && thisRect.top <= thatRect.bottom && thisRect.bottom >= thatRect.top );
+
+    // return ( thisRect.bottom >= thatRect.top && thisRect.right >= thatRect.left && thisRect.left <= thatRect.right && thisRect.top <= thatRect.bottom) ||
+          //  ( thatRect.bottom >= thisRect.top && thatRect.right >= thisRect.left && thatRect.left <= thisRect.right && thatRect.top <= thisRect.bottom);
+  }
+};
+Entity.prototype._renderCollisionBox = function() {
+  ctx.save();
+  ctx.translate(this.collisionBox.center.x, this.collisionBox.center.y);
+  ctx.strokeStyle = "red";
+  ctx.strokeStyle = this.isColliding ? "yellow" : "red";
+  ctx.lineWidth = 2;
+
+  var width, height;
+  width = this.collisionBox.width;
+  height = this.collisionBox.height;
+
+  ctx.strokeRect(-width/2, -height/2, width, height);
+
+  ctx.restore();
+};
 
 
 /*
@@ -68,9 +168,13 @@ Entity.prototype.update = function(dt) {
  *      - positive for movement right and down
  *      - negative for movement left and up
  */
-var Enemy = function(spriteURL, x, y, speed) {
+var Enemy = function(type, x, y, speed) {
+  var spriteURL = this._spriteURLForType(type);
   Entity.call(this, spriteURL, x, y);
+  this.type = type;
   this.speed = speed;
+  this.spriteURL = spriteURL;
+
 };
 Enemy.prototype = Object.create(Entity.prototype);
 Enemy.prototype.constructor = Enemy;
@@ -84,7 +188,88 @@ Enemy.prototype.update = function(dt) {
 
     var ds = this.speed * dt;
     this.location.x += ds;
+
+    this._updateCollisionBox();
 };
+Enemy.prototype._updateCollisionBox = function() {
+  var x, y, verticalAdjustment, width, height;
+
+  switch ( this.type ) {
+    case ENEMY_TYPE.zombie:
+    width = 65;
+    height = 72;
+    verticalAdjustment = 47;
+    break;
+
+    case ENEMY_TYPE.spider:
+    width = 95;
+    height = 60;
+    verticalAdjustment = 55;
+    break;
+
+    case ENEMY_TYPE.ghost:
+    width = 70;
+    height = 72;
+    verticalAdjustment = 47;
+    break;
+
+    default:
+    console.warn("WARNING: ( " + this.type + " ) is an invalid enemy type.");
+  }
+
+  x = ( this.location.x + 0.5 ) * CELL_WIDTH;
+  y = ( this.location.y + 0.5 ) * CELL_HEIGHT + verticalAdjustment;
+
+  this.collisionBox.center.x = x;
+  this.collisionBox.center.y = y;
+  this.collisionBox.width = width;
+  this.collisionBox.height = height;
+};
+Enemy.prototype.render = function() {
+  Entity.prototype.render.call(this);
+
+  //this._renderCollisionBox();
+};
+Enemy.prototype.checkCollisions = function() {
+  this.isColliding = false;
+
+  // Get all rock and laser obstacles
+  var obstacles = BoardManager.currentObstacleLayout.filter(function(obstacle) {
+    return obstacle.type !== OBSTACLE_TYPE.web;
+  });
+
+  var obstacle;
+  for ( var i = 0; i < obstacles.length; ++i ) {
+    obstacle = obstacles[i];
+    if ( this.isCollidingWithEntity(obstacle) ) {
+      this.isColliding = true;
+      break;
+    }
+  }
+};
+Enemy.prototype._spriteURLForType = function(type) {
+  var spriteURL = '';
+
+  switch ( type ) {
+    case ENEMY_TYPE.zombie:
+    spriteURL = 'images/zombie.png';
+    break;
+
+    case ENEMY_TYPE.spider:
+    spriteURL = 'images/spider.png';
+    break;
+
+    case ENEMY_TYPE.ghost:
+    spriteURL = 'images/ghost-right.png';
+    break;
+
+    default:
+    console.warn('WARNING: ( ' + type + ' ) is not a valid enemy type.');
+  }
+
+  return spriteURL;
+};
+
 
 // Draw the enemy on the screen, required method for game
 // Enemy.prototype.render = function() {
@@ -299,8 +484,8 @@ function init() {
   player = new Player('images/char-boy.png', 2, 4);
 
   // create two enemies
-  var enemy1 = new Enemy('images/enemy-bug.png', 0, 5, 2);
-  var enemy2 = new Enemy('images/enemy-bug.png', 2, 1, 1);
+  var enemy1 = new Enemy(ENEMY_TYPE.ghost, 0, 5, 1);
+  var enemy2 = new Enemy(ENEMY_TYPE.spider, 1, 3, 0);
   allEnemies.push(enemy1);
   allEnemies.push(enemy2);
 }

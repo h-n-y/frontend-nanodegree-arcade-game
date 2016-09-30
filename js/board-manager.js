@@ -51,7 +51,6 @@
   _ObstacleMap.prototype.level1 = function() {
     var obstacles = [
       // new Obstacles.rock(COLOR.blue, 2, 3),
-      // new Obstacles.laser(COLOR.yellow, 0, 4, 2)
       new Obstacles.web(1, 3),
       new Obstacles.web(2, 3),
       new Obstacles.web(3, 3),
@@ -59,6 +58,9 @@
       new Obstacles.web(1, 4),
       new Obstacles.web(2, 4),
       new Obstacles.web(3, 4),
+
+      new Obstacles.rock(COLOR.gray, 2, 5),
+      //new Obstacles.laser(COLOR.blue, 0, 4, 5)
 
     ];
     return obstacles;
@@ -73,10 +75,9 @@
   };
   _CostumeMap.prototype.level1 = function() {
     var collectibles = [
-      //new Costume.dwarf(COLOR.red, 2, 1),
-      new Costume.dwarf(COLOR.yellow, 1, 1),
-      new Costume.dwarf(COLOR.blue, 3, 1),
-      new Costume.laserman(COLOR.yellow, 2, 1)
+      // new Costume.dwarf(COLOR.yellow, 1, 1),
+      // new Costume.dwarf(COLOR.blue, 3, 1),
+      // new Costume.laserman(COLOR.yellow, 2, 1)
     ];
     return collectibles;
   };
@@ -244,6 +245,12 @@
 
     this.currentCostumeLayout.forEach(function(collectible) {
       collectible.update();
+    });
+  };
+  // Checks for enemy/obstacle and enemy/player collisions
+  BoardManager.prototype.checkEnemyCollisions = function() {
+    allEnemies.forEach(function(enemy) {
+      enemy.checkCollisions();
     });
   };
   BoardManager.prototype.renderBoard = function() {

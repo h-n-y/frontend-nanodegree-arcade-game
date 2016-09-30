@@ -54,6 +54,15 @@ var OBSTACLE_TYPE = {
     spriteURL = spriteURLForColor(color);
     Obstacle.call(this, OBSTACLE_TYPE.rock, spriteURL, x, y);
     this.color = color;
+    var verticalAdjustment = 50;
+    this.collisionBox = {
+      width: 85,
+      height: 77,
+      center: {
+        x: ( this.location.x + 0.5 ) * CELL_WIDTH,
+        y: ( this.location.y + 0.5 ) * CELL_HEIGHT + verticalAdjustment
+      }
+    };
 
     function spriteURLForColor(color) {
       var spriteURL;
@@ -80,6 +89,11 @@ var OBSTACLE_TYPE = {
   };
   Rock.prototype = Object.create(Obstacle.prototype);
   Rock.prototype.constructor = Rock;
+  Rock.prototype.render = function() {
+    Entity.prototype.render.call(this);
+
+    this._renderCollisionBox();
+  };
 
   /*
    * WEB: A sticky obstacle that hampers Player's movement.
@@ -116,9 +130,37 @@ var OBSTACLE_TYPE = {
     this.y = y;
     this.SPRITE_URL_LEFT_LASERNODE = 'images/laser-left.png';
     this.SPRITE_URL_RIGHT_LASERNODE = 'images/laser-right.png';
+    this.laserNodeCollisionBoxes;
+    this._setLaserNodeCollisionBoxes();
   };
   Laser.prototype = Object.create(Obstacle.prototype);
   Laser.prototype.constructor = Laser;
+  Laser.prototype._setLaserNodeCollisionBoxes = function() {
+    var width, height, y, verticalAdjustment;
+    width = 85;
+    height = 50;
+    verticalAdjustment = SPRITE_Y_POSITION_ADJUST + 110;
+    y = this.y * CELL_HEIGHT + verticalAdjustment;
+
+    this.laserNodeCollisionBoxes = {
+      left: {
+        width: width,
+        height: height,
+        center: {
+          x: ( this.locationLeftLaserNode + 0.5 ) * CELL_WIDTH,
+          y: y
+        }
+      },
+      right: {
+        width: width,
+        height: height,
+        center: {
+          x: ( this.locationRightLaserNode + 0.5 ) * CELL_WIDTH,
+          y: y
+        }
+      }
+    };
+  };
   Laser.prototype.render = function() {
     if ( this.locationLeftLaserNode.x !== this.locationRightLaserNode.x ) {
       console.warn("WARNING: Laser's nodes are not on the same row - will not render.");
@@ -127,6 +169,8 @@ var OBSTACLE_TYPE = {
 
     this._renderLaserBeam();
     this._renderLaserNodes();
+    // for debugging only
+    this._renderCollisionBox();
   };
   Laser.prototype._renderLaserBeam = function() {
     var x, y, verticalAdjustment;
@@ -186,6 +230,30 @@ var OBSTACLE_TYPE = {
       this.beamColor.rgb = "black";
     }
   };
+  Laser.prototype._renderCollisionBox = function() {
+    ctx.save();
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 2;
+
+    // Render left collision box
+    ctx.save();
+    var leftBox = this.laserNodeCollisionBoxes.left;
+    ctx.translate(leftBox.center.x, leftBox.center.y);
+    ctx.strokeRect(-leftBox.width / 2, -leftBox.height / 2, leftBox.width, leftBox.height);
+    ctx.restore();
+
+    // Render right collision box
+    var rightBox = this.laserNodeCollisionBoxes.right;
+    ctx.translate(rightBox.center.x, rightBox.center.y);
+    ctx.strokeRect(-rightBox.width / 2, -rightBox.height / 2, rightBox.width, rightBox.height);
+
+
+    ctx.restore();
+  };
+  // // Override Entity implementation
+  // Laser.prototype._collisionBoxIntersects = function(entity) {
+  //
+  // };
 
   // Allow global access to the Rock, Web, and Laser classes.
   window.Obstacles = {

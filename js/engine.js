@@ -91,7 +91,7 @@ var Engine = (function(global) {
         updateEntities(dt);
         updateCollectibles(dt);
         updateAnimations(dt);
-        // checkCollisions();
+        checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the
@@ -116,6 +116,10 @@ var Engine = (function(global) {
     // animations.
     function updateAnimations(dt) {
       AnimationQueue.update(dt);
+    }
+
+    function checkCollisions() {
+      BoardManager.checkEnemyCollisions();
     }
 
     /* This function initially draws the "game level", it will then call
@@ -193,7 +197,12 @@ var Engine = (function(global) {
         'images/laser-left.png',
         'images/laser-right.png',
 
-        'images/web.png'
+        'images/web.png',
+
+        'images/ghost-left.png',
+        'images/ghost-right.png',
+        'images/spider.png',
+        'images/zombie.png',
     ]);
     Resources.onReady(init);
 
