@@ -217,11 +217,11 @@ Enemy.prototype._updateCollisionBox = function() {
   this.collisionBox.width = width;
   this.collisionBox.height = height;
 };
-Enemy.prototype.render = function() {
-  Entity.prototype.render.call(this);
-
-  //this._renderCollisionBox();
-};
+// Enemy.prototype.render = function() {
+//   Entity.prototype.render.call(this);
+//
+//   //this._renderCollisionBox();
+// };
 Enemy.prototype.checkCollisions = function() {
   this.isColliding = false;
 
@@ -241,6 +241,14 @@ Enemy.prototype.checkCollisions = function() {
       this._changeDirection();
       break;
     }
+  }
+
+  // Check if enemy has collided with player
+  if ( this.isCollidingWithEntity(player) ) {
+    this.isColliding = true;
+
+    // Player dies: start level over
+    // TODO 
   }
 };
 // Causes the enemy to change directions.
@@ -315,14 +323,49 @@ var Player = function(spriteURL, x, y) {
   this.webStatus = {
     caughtInWeb: false,
     hasAttemptedToMove: false
-  }
-}
+  };
+  this.collisionBox;
+  //this._setCollisionBox();
+  this._updateCollisionBox();
+};
 Player.prototype = Object.create(Entity.prototype);
 Player.prototype.constructor = Player;
+// Player.prototype._setCollisionBox = function() {
+//   var verticalAdjustment = SPRITE_Y_POSITION_ADJUST + 75;
+//
+//   this.collisionBox = {
+//     width: 50,
+//     height: 80,
+//     center: {
+//       x: ( this.location.x + 0.5 ) * CELL_WIDTH,
+//       y: ( this.location.y + 0.5 ) * CELL_HEIGHT + verticalAdjustment
+//     }
+//   };
+// };
+Player.prototype._updateCollisionBox = function() {
+  var x, y, width, height, verticalAdjustment;
+  verticalAdjustment = SPRITE_Y_POSITION_ADJUST + 70;
+  x = ( this.location.x + 0.5 ) * CELL_WIDTH;
+  y = ( this.location.y + 0.5 ) * CELL_HEIGHT + verticalAdjustment;
+  width = 67;
+  height = 75;
+
+  this.collisionBox = {
+    width: width,
+    height: height,
+    center: {
+      x: x,
+      y: y
+    }
+  };
+};
 Player.prototype.canSmashRock = function(rock) {
   if ( this._isDwarf() ) {
     return this._dwarfCostume().color === rock.color;
   }
+};
+Player.prototype.update = function() {
+  this._updateCollisionBox();
 };
 // Performs the actual work of drawing the Player and any worn
 // equipment onscreen.
@@ -391,6 +434,7 @@ Player.prototype._laserManCostume = function() {
 };
 Player.prototype.render = function() {
   this._draw();
+  this._renderCollisionBox();
 };
 Player.prototype.startLaserShieldAnimation = function() {
 
