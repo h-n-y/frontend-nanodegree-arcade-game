@@ -163,10 +163,9 @@ Entity.prototype._renderCollisionBox = function() {
 var Enemy = function(type, x, y, speed) {
   var spriteURL = this._spriteURLForType(type);
   Entity.call(this, spriteURL, x, y);
-  this.type = type;
-  this.speed = speed;
   this.spriteURL = spriteURL;
-
+  this.type = type;
+  this.currentSpeed = speed;
 };
 Enemy.prototype = Object.create(Entity.prototype);
 Enemy.prototype.constructor = Enemy;
@@ -178,7 +177,7 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
 
-    var ds = this.speed * dt;
+    var ds = this.currentSpeed * dt;
     this.location.x += ds;
 
     this._updateCollisionBox();
@@ -217,11 +216,6 @@ Enemy.prototype._updateCollisionBox = function() {
   this.collisionBox.width = width;
   this.collisionBox.height = height;
 };
-// Enemy.prototype.render = function() {
-//   Entity.prototype.render.call(this);
-//
-//   //this._renderCollisionBox();
-// };
 Enemy.prototype.checkCollisions = function() {
   this.isColliding = false;
 
@@ -248,9 +242,10 @@ Enemy.prototype.checkCollisions = function() {
     this.isColliding = true;
 
     // Player dies: start level over
-    // TODO 
+    // TODO
   }
 };
+
 // Causes the enemy to change directions.
 // Example: An enemy moving to the right will now move to the left.
 // This method is called after an enemy runs into an obstacle
@@ -258,7 +253,7 @@ Enemy.prototype._changeDirection = function() {
   // Ghosts don't change directions because they can pass through obstacles!
   if ( this.type === ENEMY_TYPE.ghost ) return;
 
-  this.speed *= -1;
+  this.currentSpeed *= -1;
 };
 Enemy.prototype._spriteURLForType = function(type) {
   var spriteURL = '';
@@ -283,6 +278,73 @@ Enemy.prototype._spriteURLForType = function(type) {
   return spriteURL;
 };
 
+/*
+ * Zombie: an enemy zombie
+ */
+var Zombie = function(x, y, speed) {
+  Enemy.call(this, ENEMY_TYPE.zombie, x, y, speed);
+};
+Zombie.prototype = Object.create(Enemy.prototype);
+Zombie.prototype.constructor = Zombie;
+
+/*
+ * Spider: an enemy spider
+ */
+var Spider = function(x, y, speed) {
+  Enemy.call(this, ENEMY_TYPE.spider, x, y, speed);
+};
+Spider.prototype = Object.create(Enemy.prototype);
+Spider.prototype.constructor = Spider;
+
+/*
+ * Ghost: an enemy ghost
+ */
+var Ghost = function(x, y, speed) {
+  Enemy.call(this, ENEMY_TYPE.ghost, x, y, speed);
+  this.normalSpeed = speed;
+  this.attackSpeed = 2 * speed;
+};
+Ghost.prototype = Object.create(Enemy.prototype);
+Ghost.prototype.constructor = Ghost;
+// Returns true iff player is in enemy's horizontal line of sight.
+Ghost.prototype._canSeePlayer = function() {
+  if ( player.location.y !== this.location.y ) return false;
+
+  if ( this._movingRight() && player.location.x >= this.location.x ||
+        this._movingLeft() && player.location.x <= this.location.x ) {
+          return true;
+  }
+
+  return false;
+};
+Ghost.prototype._movingRight = function() {
+  return this.currentSpeed > 0;
+};
+Ghost.prototype._movingLeft = function() {
+  return this.currentSpeed < 0;
+};
+Ghost.prototype.update = function(dt) {
+  Enemy.prototype.update.call(this, dt)
+
+  this._updateAttackMode();
+};
+Ghost.prototype._updateSpriteURL = function() {
+  var spriteURL;
+  if ( this._movingRight ) {
+    spriteURL = this._canSeePlayer() ? 'images/ghost-right-attacking.png' : 'images/ghost-right.png';
+  } else {
+    spriteURL = this._canSeePlayer() ? 'images/ghost-left-attacking.png' : 'images/ghost-left.png';
+  }
+  this.spriteURL = spriteURL;
+};
+Ghost.prototype._updateAttackMode = function() {
+  if ( this.type !== ENEMY_TYPE.ghost ) return;
+
+  // If ghost can see player, set the sprite to the attacking ghost and
+  // increase speed to attacking speed.
+  this.currentSpeed = this._canSeePlayer() ? this.attackSpeed : this.normalSpeed;
+  this._updateSpriteURL();
+};
 
 // Draw the enemy on the screen, required method for game
 // Enemy.prototype.render = function() {
@@ -364,7 +426,7 @@ Player.prototype.canSmashRock = function(rock) {
     return this._dwarfCostume().color === rock.color;
   }
 };
-Player.prototype.update = function() {
+Player.prototype.update = function(dt) {
   this._updateCollisionBox();
 };
 // Performs the actual work of drawing the Player and any worn
@@ -533,9 +595,9 @@ function init() {
   player = new Player('images/char-boy.png', 2, 4);
 
   // create two enemies
-  var enemy1 = new Enemy(ENEMY_TYPE.ghost, 0, 5, 1);
-  var enemy2 = new Enemy(ENEMY_TYPE.spider, 1, 3, 0);
-  var movingSpider = new Enemy(ENEMY_TYPE.spider, 0, 5, 0.5);
+  var enemy1 = new Ghost(0, 5, 1);
+  var enemy2 = new Spider(1, 3, 0);
+  var movingSpider = new Spider(0, 5, 0.5);
   allEnemies.push(enemy1);
   allEnemies.push(enemy2);
   allEnemies.push(movingSpider);

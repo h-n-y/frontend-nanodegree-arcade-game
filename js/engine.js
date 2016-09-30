@@ -200,7 +200,9 @@ var Engine = (function(global) {
         'images/web.png',
 
         'images/ghost-left.png',
+        'images/ghost-left-attacking.png',
         'images/ghost-right.png',
+        'images/ghost-right-attacking.png',
         'images/spider.png',
         'images/zombie.png',
     ]);
