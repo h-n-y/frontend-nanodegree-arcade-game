@@ -63,6 +63,10 @@
     this.id = null;
     this.animationQueue = null;
     this.complete = false;
+    this.animationOrigin = {
+      x: ( this.location.x + 0.5 ) * CELL_WIDTH,
+      y: ( this.location.y + 0.5 ) * CELL_HEIGHT + SPRITE_Y_POSITION_ADJUST + 70
+    };
   };
   Animation.prototype = Object.create(Entity.prototype);
   Animation.prototype.constructor = Animation;
@@ -106,10 +110,6 @@
       fill: ""
     };
     this._setColor(color);
-    this.animationOrigin = {
-      x: ( this.location.x + 0.5 ) * CELL_WIDTH,
-      y: ( this.location.y + 0.5 ) * CELL_HEIGHT + SPRITE_Y_POSITION_ADJUST + 70
-    };
     this.particles = [
       {
         location: {
@@ -233,10 +233,6 @@
   var LaserShield = function(color, x, y) {
     Animation.call(this, x, y);
     this._setColor(color);
-    this.animationOrigin = {
-      x: ( this.location.x + 0.5 ) * CELL_WIDTH,
-      y: ( this.location.y + 0.5 ) * CELL_HEIGHT + SPRITE_Y_POSITION_ADJUST + 70
-    };
     this.particles = {
       backgroundCircle: {
         radius: 70,
@@ -352,12 +348,94 @@
     }
   };
 
+  /*
+   * WebStruggle: An animation showing the player struggling to move throught
+   *              a spider web.
+   *
+   *  Class Hierarchy: Object > Entity > Animation > WebStruggle
+   */
+  var WebStruggle = function(x, y) {
+    Animation.call(this, x, y);
+    this.particles = {
+      diamond1: {
+        width: 80,
+        lineWidth: 20,  // 10 --> 0
+        alpha: 0, // 0 --> 1
+        speed: 150,
+        complete: false,
+        update: function(dt) {
+          var ds = this.speed * dt;
+          this.lineWidth = Math.max(0, this.lineWidth - ds);
+          this.alpha = Math.min(1, this.alpha + ds);
+
+          // End animation
+          if ( this.lineWidth === 0 && this.alpha === 1 ) {
+            this.complete = true;
+          }
+        }
+      },
+      diamond2: {
+        width: 50, // 0 -- > 30
+        lineWidth: 20,  // 20 --> 0
+        speed: 100,
+        complete: false,
+        update: function(dt) {
+          var ds = this.speed * dt;
+          this.width = Math.min(50, this.width + 2 * ds);
+          this.lineWidth = Math.max(0, this.lineWidth - ds);
+
+          // Mark animation complete
+          if ( this.lineWidth === 0 && this.width === 50 ) {
+            this.complete = true;
+          }
+        }
+      }
+    }
+  };
+  WebStruggle.prototype = Object.create(Animation.prototype);
+  WebStruggle.prototype.constructor = WebStruggle;
+  WebStruggle.prototype.update = function(dt) {
+    var diamond1, diamond2;
+    diamond1 = this.particles.diamond1;
+    diamond2 = this.particles.diamond2;
+    diamond1.update(dt);
+    diamond2.update(dt);
+
+    if ( diamond1.complete && diamond2.complete ) {
+      this.complete = true;
+    }
+  };
+  WebStruggle.prototype.render = function() {
+    ctx.save();
+
+    ctx.strokeStyle = "white";
+    ctx.translate(this.animationOrigin.x, this.animationOrigin.y);
+    ctx.rotate(Math.PI / 4);
+
+    var diamond1, diamond2;
+    diamond1 = this.particles.diamond1;
+    diamond2 = this.particles.diamond2;
+
+    ctx.lineWidth = diamond1.lineWidth;
+    ctx.strokeRect(-diamond1.width/2, -diamond1.width/2, diamond1.width, diamond1.width);
+
+    ctx.strokeStyle = "rgb(241, 70, 70)";
+    ctx.lineWidth = diamond2.lineWidth;
+    ctx.strokeRect(-diamond2.width/2, -diamond2.width/2, diamond2.width, diamond2.width);
+
+    ctx.restore();
+
+
+    this._checkForCompletion();
+  };
+
 
   // Make AnimationQueue and animations available globally
   window.AnimationQueue = new AnimationQueue();
   window.Animation = {
     rockSmash: RockSmash,
-    laserShield: LaserShield
+    laserShield: LaserShield,
+    webStruggle: WebStruggle
   };
 
 }());

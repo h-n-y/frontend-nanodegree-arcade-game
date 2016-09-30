@@ -50,8 +50,15 @@
   };
   _ObstacleMap.prototype.level1 = function() {
     var obstacles = [
-      new Obstacles.rock(COLOR.blue, 2, 3),
-      new Obstacles.laser(COLOR.yellow, 0, 4, 2)
+      // new Obstacles.rock(COLOR.blue, 2, 3),
+      // new Obstacles.laser(COLOR.yellow, 0, 4, 2)
+      new Obstacles.web(1, 3),
+      new Obstacles.web(2, 3),
+      new Obstacles.web(3, 3),
+
+      new Obstacles.web(1, 4),
+      new Obstacles.web(2, 4),
+      new Obstacles.web(3, 4),
 
     ];
     return obstacles;
@@ -229,7 +236,8 @@
       }
 
       function handleWebCollision() {
-
+        player.webStatus.caughtInWeb = true;
+        player.webStatus.hasAttemptedToMove = false;
       }
   };
   BoardManager.prototype.updateCostumes = function(dt) {

@@ -191,7 +191,9 @@ var Engine = (function(global) {
         'images/ghost-costume.png',
 
         'images/laser-left.png',
-        'images/laser-right.png'
+        'images/laser-right.png',
+
+        'images/web.png'
     ]);
     Resources.onReady(init);
 

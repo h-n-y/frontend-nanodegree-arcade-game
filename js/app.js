@@ -103,6 +103,8 @@ Enemy.prototype.update = function(dt) {
  *  Properties:
  *    * costumes: an array that holds Costume objects the player
  *        is wearing
+ *    * webStatus: identifies whether Player is caught in a spider web obstacle, and
+ *          whether or not Player has attempted to move out of that web.
  *
  *  Methods:
  *    * canSmashRock(rock): Returns true iff player can smash `rock`.
@@ -120,6 +122,10 @@ var Player = function(spriteURL, x, y) {
   Entity.call(this, spriteURL, x, y);
   this.costumes = [];
   this._laserShieldAnimation = null;
+  this.webStatus = {
+    caughtInWeb: false,
+    hasAttemptedToMove: false
+  }
 }
 Player.prototype = Object.create(Entity.prototype);
 Player.prototype.constructor = Player;
@@ -211,9 +217,21 @@ Player.prototype.endLaserShieldAnimation = function() {
   }
 };
 Player.prototype.handleInput = function(direction) {
+
+  // If player is caught in a spider web and has not yet attempted to move away,
+  // do not let player move. Instead, show an animation acknowledging the attempt.
+  // ( A player can only move out of a spider web on the second attempt to move. )
+  if ( player.webStatus.caughtInWeb && !player.webStatus.hasAttemptedToMove ) {
+    player.webStatus.hasAttemptedToMove = true;
+    // Show web animation here
+    // TODO
+    var animation = new Animation.webStruggle(player.location.x, player.location.y);
+    AnimationQueue.addAnimation(animation);
+    return;
+  }
+
+
   // Attempt to move player
-  // NOTE: Do I'm not sure why I must use .call on this method?
-  // Not using .call makes `this` the Window object in the movePlayer function...
   var playerMoved = movePlayer.call(this, direction);
   if ( playerMoved ) {
     // Now that the player has moved, the board ( may ) need to update.
