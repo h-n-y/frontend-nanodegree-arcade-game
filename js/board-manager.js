@@ -159,86 +159,86 @@
 
     player.endLaserShieldAnimation();
 
-      // Check if player has picked up the Candy to complete the level
+    // Check if player has picked up the Candy to complete the level
+    // TODO
+
+    // Check if player has picked up a new costume
+    var costume;
+    for ( var i = 0; i < this.currentCostumeLayout.length; ++i ) {
+      costume = this.currentCostumeLayout[i];
+
+      // Check if player picked up this costume
+      var playerPickedUpCostume = location.x === costume.location.x && location.y === costume.originalYLocation;
+      if ( playerPickedUpCostume ) {
+        // Remove costume from the board
+        this.currentCostumeLayout.splice(i, 1);
+
+        // Add costume to player
+        player.costumes.push(costume);
+
+        break;
+      }
+    }
+
+    // Check if player has run into an obstacle
+    var obstacle = this._obstacleAtLocation(location);
+    if ( !obstacle ) return;
+
+
+    switch ( obstacle.type ) {
+      case OBSTACLE_TYPE.rock:
+      handleRockCollision.call(this);
+      break;
+
+      case OBSTACLE_TYPE.laser:
+      handleLaserCollision.call(this);
+      break;
+
+      case OBSTACLE_TYPE.web:
+      handleWebCollision.call(this);
+      break;
+
+    }
+
+    // The player has smashed the rock.
+    // Remove the rock from the board and animate its destruction.
+    function handleRockCollision() {
+      // Rename for clarity
+      var rock = obstacle;
+
+      // Remove rock
+      var rockIndex = this.currentObstacleLayout.findIndex(function(obstacle) {
+        return obstacle.location.x === rock.location.x && obstacle.location.y === rock.location.y;
+      });
+      this.currentObstacleLayout.splice(rockIndex, 1);
+
+      // Animate rock destruction
+      var animation = new Animation.rockSmash(rock.color, location.x, location.y);
+      AnimationQueue.addAnimation(animation);
+    }
+
+    // Player has run into a laser beam.
+    // If player is wearing a LaserMan costume matching laser's color, player can
+    // pass through. Otherwise, the player 'dies' and the level starts over.
+    function handleLaserCollision() {
+      // rename for clarity
+      var laser = obstacle;
+
+      var playerInvulnerableToLaser = ( player._isLaserMan() && player._laserManCostume().color ===  laser.beamColor.name );
+      if ( playerInvulnerableToLaser/* && !player.laserShieldIsOn*/ ) {
+        // Start laser shield animation around player
+        player.endLaserShieldAnimation();
+        player.startLaserShieldAnimation();
+      }
+
+      // Player is vulnerable to laser and dies. Start level over.
       // TODO
+    }
 
-      // Check if player has picked up a new costume
-      var costume;
-      for ( var i = 0; i < this.currentCostumeLayout.length; ++i ) {
-        costume = this.currentCostumeLayout[i];
-
-        // Check if player picked up this costume
-        var playerPickedUpCostume = location.x === costume.location.x && location.y === costume.originalYLocation;
-        if ( playerPickedUpCostume ) {
-          // Remove costume from the board
-          this.currentCostumeLayout.splice(i, 1);
-
-          // Add costume to player
-          player.costumes.push(costume);
-
-          break;
-        }
-      }
-
-      // Check if player has run into an obstacle
-      var obstacle = this._obstacleAtLocation(location);
-      if ( !obstacle ) return;
-
-
-      switch ( obstacle.type ) {
-        case OBSTACLE_TYPE.rock:
-        handleRockCollision.call(this);
-        break;
-
-        case OBSTACLE_TYPE.laser:
-        handleLaserCollision.call(this);
-        break;
-
-        case OBSTACLE_TYPE.web:
-        handleWebCollision.call(this);
-        break;
-
-      }
-
-      // The player has smashed the rock.
-      // Remove the rock from the board and animate its destruction.
-      function handleRockCollision() {
-        // Rename for clarity
-        var rock = obstacle;
-
-        // Remove rock
-        var rockIndex = this.currentObstacleLayout.findIndex(function(obstacle) {
-          return obstacle.location.x === rock.location.x && obstacle.location.y === rock.location.y;
-        });
-        this.currentObstacleLayout.splice(rockIndex, 1);
-
-        // Animate rock destruction
-        var animation = new Animation.rockSmash(rock.color, location.x, location.y);
-        AnimationQueue.addAnimation(animation);
-      }
-
-      // Player has run into a laser beam.
-      // If player is wearing a LaserMan costume matching laser's color, player can
-      // pass through. Otherwise, the player 'dies' and the level starts over.
-      function handleLaserCollision() {
-        // rename for clarity
-        var laser = obstacle;
-
-        var playerInvulnerableToLaser = ( player._isLaserMan() && player._laserManCostume().color ===  laser.beamColor.name );
-        if ( playerInvulnerableToLaser/* && !player.laserShieldIsOn*/ ) {
-          // Start laser shield animation around player
-          player.endLaserShieldAnimation();
-          player.startLaserShieldAnimation();
-        }
-
-        // Player is vulnerable to laser and dies. Start level over.
-        // TODO
-      }
-
-      function handleWebCollision() {
-        player.webStatus.caughtInWeb = true;
-        player.webStatus.hasAttemptedToMove = false;
-      }
+    function handleWebCollision() {
+      player.webStatus.caughtInWeb = true;
+      player.webStatus.hasAttemptedToMove = false;
+    }
   };
   BoardManager.prototype.updateCostumes = function(dt) {
 

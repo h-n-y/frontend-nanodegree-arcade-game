@@ -349,7 +349,7 @@
   };
 
   /*
-   * WebStruggle: An animation showing the player struggling to move throught
+   * WebStruggle: An animation showing the player struggling to move through
    *              a spider web.
    *
    *  Class Hierarchy: Object > Entity > Animation > WebStruggle
@@ -375,8 +375,8 @@
         }
       },
       diamond2: {
-        width: 50, // 0 -- > 30
-        lineWidth: 20,  // 20 --> 0
+        width: 50,
+        lineWidth: 20,
         speed: 100,
         complete: false,
         update: function(dt) {
@@ -424,8 +424,6 @@
     ctx.strokeRect(-diamond2.width/2, -diamond2.width/2, diamond2.width, diamond2.width);
 
     ctx.restore();
-
-
     this._checkForCompletion();
   };
 
