@@ -352,6 +352,7 @@ Ghost.prototype.constructor = Ghost;
 // Returns true iff player is in enemy's horizontal line of sight.
 Ghost.prototype._canSeePlayer = function() {
   if ( player.location.y !== this.location.y ) return false;
+  if ( player._isGhost() ) return false;
 
   if ( this._movingRight() && player.location.x >= this.location.x ||
         this._movingLeft() && player.location.x <= this.location.x ) {

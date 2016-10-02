@@ -83,6 +83,7 @@
       // new Costume.dwarf(COLOR.yellow, 1, 1),
       // new Costume.dwarf(COLOR.blue, 3, 1),
       // new Costume.laserman(COLOR.yellow, 2, 1)
+      new Costume.ghost(4, 4)
     ];
     return collectibles;
   };
