@@ -88,6 +88,7 @@
     return collectibles;
   };
 
+
   /*
    *  BOARDMANAGER: Provides relevant information about the design layout
    *  of the current level during the render and update stages.
@@ -122,9 +123,10 @@
    */
   var BoardManager = function() {
     this.currentLevel             = 1;
-    this.currentObstacleLayout    = this._initialObstacleLayout();
-    this.currentCostumeLayout     = this._initialCostumeLayout();
-    this._rowMap                  = new _RowMap();
+    // this.currentObstacleLayout    = this._initialObstacleLayout();
+    // this.currentCostumeLayout     = this._initialCostumeLayout();
+    this.currentLevelMap = this._levelMapForLevel(this.currentLevel);
+    //this._rowMap                  = new _RowMap();
   };
   BoardManager.prototype.playerCanOccupyLocation = function(location) {
     var allObstacles, rocks, lasers;
@@ -247,8 +249,7 @@
     }
   };
   BoardManager.prototype.updateCostumes = function(dt) {
-
-    this.currentCostumeLayout.forEach(function(collectible) {
+    this.currentLevelMap.costumeLayout.forEach(function(collectible) {
       collectible.update();
     });
   };
@@ -260,22 +261,10 @@
   };
   // Returns the current row and column dimensions of the board
   BoardManager.prototype.boardDimensions = function() {
-    var numRows, numCols;
-
-    switch ( this.currentLevel ) {
-      case 1:
-      numRows = 7;
-      numCols = 8;
-      break;
-
-      default:
-      console.warn("WARNING: ( " + this.currentLevel + " ) is an invalid level.");
-    }
-
     return {
-      numRows: numRows,
-      numCols: numCols
-    };
+      numRows: this.currentLevelMap.numRows,
+      numCols: this.currentLevelMap.numCols
+    }
   };
   BoardManager.prototype.renderBoard = function() {
     this._renderRows();
@@ -285,7 +274,7 @@
   BoardManager.prototype._renderRows = function() {
     // Get image urls for all of the board's rows
     var rowImageURLs, boardDimensions;
-    rowImageURLs = this._rowLayout();
+    rowImageURLs = this.currentLevelMap.rowLayout;
     boardDimensions = this.boardDimensions();
     // Draw the rows
     for ( var row = 0; row < boardDimensions.numRows; ++row ) {
@@ -297,82 +286,32 @@
   BoardManager.prototype._renderObstacles = function() {
 
     // Draw the obstacles to the canvas
-    this.currentObstacleLayout.forEach(function(obstacle) {
+    this.currentLevelMap.obstacleLayout.forEach(function(obstacle) {
       obstacle.render();
     });
   }
   BoardManager.prototype._renderCostumes = function() {
 
     // Draw the collectibles to the canvas
-    this.currentCostumeLayout.forEach(function(collectible) {
+    this.currentLevelMap.costumeLayout.forEach(function(collectible) {
       collectible.render();
     });
   };
-  BoardManager.prototype._rowLayout = function() {
-    var rowLayout;
-
-    // Get the row layout for the current level
-    switch ( this.currentLevel ) {
-      case 1:
-      rowLayout = this._rowMap.level1();
-      break;
-
-      default:
-      console.warn("WARNING: currentLevel ( " + this.currentLevel + " ) is not a valid level.");
-      rowLayout = [];
-    }
-
-    return rowLayout;
-  };
-  BoardManager.prototype._initialObstacleLayout = function() {
-    var obstacleMap, initialObstacleLayout;
-    obstacleMap = new _ObstacleMap();
-
-    // Get the obstacle layout for the current level
-    switch ( this.currentLevel ) {
-      case 1:
-      initialObstacleLayout = obstacleMap.level1();
-      break;
-
-      default:
-      console.warn("WARNING: currentLevel ( " + this.currentLevel + " ) is not a valid level.");
-      initialObstacleLayout = {};
-    }
-
-    return initialObstacleLayout;
-  }
-  BoardManager.prototype._initialCostumeLayout = function() {
-    var collectibleMap, initialCollectibleLayout;
-    collectibleMap = new _CostumeMap();
-
-    // Get the collectibles layout for the current level
-    switch ( this.currentLevel ) {
-      case 1:
-      initialCollectibleLayout = collectibleMap.level1();
-      break;
-
-      default:
-      console.warn("WARNING: currentLevel ( " + this.currentLevel + " ) is not a valid level");
-      initialCollectibleLayout = {};
-    }
-
-    return initialCollectibleLayout;
-  };
   // Returns all of the rock obstacles currently on the board.
   BoardManager.prototype._rockObstacles = function() {
-    return this.currentObstacleLayout.filter(function(obstacle) {
+    return this.currentLevelMap.obstacleLayout.filter(function(obstacle) {
       return obstacle.type === OBSTACLE_TYPE.rock;
-    })
+    });
   };
   // Returns all of the laser obstacles currently on the board.
   BoardManager.prototype._laserObstacles = function() {
-    return this.currentObstacleLayout.filter(function(obstacle) {
+    return this.currentLevelMap.obstacleLayout.filter(function(obstacle) {
       return obstacle.type === OBSTACLE_TYPE.laser;
     });
   };
   // Returns the object at location or undefined if no such object exists.
   BoardManager.prototype._obstacleAtLocation = function(location) {
-    return this.currentObstacleLayout.find(function(obstacle) {
+    return this.currentLevelMap.obstacleLayout.find(function(obstacle) {
       if ( obstacle.type === OBSTACLE_TYPE.laser ) {
         // Check if location is occupied by a laser beam
         return (  location.x < obstacle.locationRightLaserNode &&
@@ -383,6 +322,36 @@
       return obstacle.location.x === location.x && obstacle.location.y === location.y;
     });
   }
+  BoardManager.prototype._levelMapForLevel = function(levelNum) {
+    var levelMap;
+
+    switch ( levelNum ) {
+      case 1:
+      levelMap = {
+        numCols: 4,
+        numRows: 4,
+        playerStart: {
+          x: 2,
+          y: 3
+        },
+        playerFinish: {
+          x: 0,
+          y: 0
+        },
+        rowLayout: [
+          'images/grass-block.png',
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/water-block.png'
+        ],
+        obstacleLayout: [],
+        costumeLayout: []
+      }
+      break;
+    }
+
+    return levelMap;
+  };
 
   // Make BoardManager available globally
   window.BoardManager = new BoardManager();

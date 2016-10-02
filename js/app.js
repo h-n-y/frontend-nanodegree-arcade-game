@@ -225,9 +225,12 @@ Enemy.prototype.checkCollisions = function() {
   this.isColliding = false;
 
   // Get all rock and laser obstacles
-  var obstacles = BoardManager.currentObstacleLayout.filter(function(obstacle) {
+  var obstacles = BoardManager.currentLevelMap.obstacleLayout.filter(function(obstacle) {
     return obstacle.type !== OBSTACLE_TYPE.web;
   });
+  // var obstacles = BoardManager.currentObstacleLayout.filter(function(obstacle) {
+  //   return obstacle.type !== OBSTACLE_TYPE.web;
+  // });
 
   // Check whether `this` has run into an obstacle
   var obstacle;
@@ -638,7 +641,8 @@ Player.prototype.handleInput = function(direction) {
 // Place the player object in a variable called player
 var player, allEnemies = [];
 function init() {
-  player = new Player('images/char-boy.png', 2, 4);
+  var playerStartLocation = BoardManager.currentLevelMap.playerStart;
+  player = new Player('images/char-boy.png', playerStartLocation.x, playerStartLocation.y);
 
   // create two enemies
   var enemy1 = new Ghost(0, 5, 1);
