@@ -20,74 +20,49 @@
  */
 (function() {
 
-  /*
-   *  _ROWMAP: Provides a complete description of what ground images
-   *  to use for each row in each level.
-   *  For example, it might say that the top row of level 1 should
-   *  be rendered with the water image.
-   */
-  var _RowMap = function() {
+  // Returns a random integer in [left, right] assuming left < right
+  function randomIntegerInRange(left, right) {
+    var small, large;
+    small = Math.min(left, right);
+    large = Math.max(left, right);
 
+    return Math.floor(Math.random() * ( large - small + 1)) + small;
+  }
+
+  var EnemyGenerator = function(level) {
+    this.currentLevel = level;
+    this.nextEnemyID = 0;
   };
-  _RowMap.prototype.level1 = function() {
-    var layout = [
-      'images/water-block.png',   // Top row is water
-      'images/stone-block.png',
-      'images/stone-block.png',
-      'images/stone-block.png',
-      'images/stone-block.png',
-      'images/grass-block.png',    // Bottom row is grass
-      'images/grass-block.png',   // Bottom row is grass
-      'images/grass-block.png',    // Bottom row is grass
-    ];
-    return layout;
+  EnemyGenerator.prototype.generate = function() {
+    switch ( this.currentLevel ) {
+      case 1:
+      this._generateLevel1();
+      break;
+
+      default:
+      console.warn("WARNING: ( " + this.currentLevel + " ) is an invalid level.");
+    }
   };
+  EnemyGenerator.prototype._generateLevel1 = function() {
+    // Set initial enemies for level
+    var zombie1, zombie2;
+    zombie1 = new Zombie(0, 1, 1);
+    zombie2 = new Zombie(-1, 2, 2);
+    zombie1.id = this.nextEnemyID++;
+    zombie2.id = this.nextEnemyID++;
+    allEnemies = [zombie1, zombie2];
 
-  /*
-   *  _OBSTACLEMAP: Provides a complete description of the locations of
-   *  obstacles for every level.
-   */
-  var _ObstacleMap = function() {
+    var rows, speeds, delays;
+    rows = [1, 2];
+    speeds = [1, 2];
+    delays = [1000, 1500, 2000];
 
+    setInterval(function() {
+      // Random integer in [0, 1]
+      //var randomIndex = Math.floor(Math.random() * 2);
+      allEnemies.push(new Zombie(-1, rows[randomIntegerInRange(0, 1)], speeds[randomIntegerInRange(0, 1)]));
+    }, delays[randomIntegerInRange(0, 2)]);
   };
-  _ObstacleMap.prototype.level1 = function() {
-    var obstacles = [
-      // new Obstacles.rock(COLOR.blue, 2, 3),
-      new Obstacles.web(1, 3),
-      new Obstacles.web(2, 3),
-      new Obstacles.web(3, 3),
-
-      new Obstacles.web(1, 4),
-      new Obstacles.web(2, 4),
-      new Obstacles.web(3, 4),
-
-      new Obstacles.jackolantern(0, 0),
-      new Obstacles.skull(1, 0)
-
-      //new Obstacles.rock(COLOR.gray, 2, 5),
-      //new Obstacles.laser(COLOR.blue, 0, 4, 5)
-
-    ];
-    return obstacles;
-  };
-
-  /*
-   *  _COLLECTIBLEMAP: Provides a complete description of the locations of
-   *  collectibles for every level.
-   */
-  var _CostumeMap = function() {
-
-  };
-  _CostumeMap.prototype.level1 = function() {
-    var collectibles = [
-      // new Costume.dwarf(COLOR.yellow, 1, 1),
-      // new Costume.dwarf(COLOR.blue, 3, 1),
-      // new Costume.laserman(COLOR.yellow, 2, 1)
-      new Costume.ghost(4, 4)
-    ];
-    return collectibles;
-  };
-
 
   /*
    *  BOARDMANAGER: Provides relevant information about the design layout
@@ -122,11 +97,16 @@
    *    * _initialCostumeLayout: Returns the initial collectibles layout for the current level
    */
   var BoardManager = function() {
-    this.currentLevel             = 1;
-    // this.currentObstacleLayout    = this._initialObstacleLayout();
-    // this.currentCostumeLayout     = this._initialCostumeLayout();
+    this.currentLevel = 1;
     this.currentLevelMap = this._levelMapForLevel(this.currentLevel);
-    //this._rowMap                  = new _RowMap();
+    this._enemyGenerator = new EnemyGenerator(this.currentLevel);
+  };
+  BoardManager.prototype.beginCurrentLevel = function() {
+    // Update level map for the new level
+    this.currentLevelMap = this._levelMapForLevel(this.currentLevel);
+    // Begin generating enemies for this level.
+    this._enemyGenerator.currentLevel = this.currentLevel;
+    this._enemyGenerator.generate();
   };
   BoardManager.prototype.playerCanOccupyLocation = function(location) {
     var allObstacles, rocks, lasers;
@@ -172,7 +152,8 @@
 
     // Check if player has picked up a new costume
     var costume;
-    for ( var i = 0; i < this.currentCostumeLayout.length; ++i ) {
+    //for ( var i = 0; i < this.currentCostumeLayout.length; ++i ) {
+    for ( var i = 0; i < this.currentLevelMap.costumeLayout.length; ++i ) {
       costume = this.currentCostumeLayout[i];
 
       // Check if player picked up this costume

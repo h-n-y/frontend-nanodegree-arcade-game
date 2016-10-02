@@ -171,6 +171,9 @@ var Enemy = function(type, x, y, speed) {
   this.spriteURL = spriteURL;
   this.type = type;
   this.currentSpeed = speed;
+  // unique identifier for this enemy.
+  // Used when removing the enemy from the board and the global allEnemies array 
+  this.id;
 };
 Enemy.prototype = Object.create(Entity.prototype);
 Enemy.prototype.constructor = Enemy;
@@ -644,13 +647,14 @@ function init() {
   var playerStartLocation = BoardManager.currentLevelMap.playerStart;
   player = new Player('images/char-boy.png', playerStartLocation.x, playerStartLocation.y);
 
-  // create two enemies
-  var enemy1 = new Ghost(0, 5, 1);
-  var enemy2 = new Spider(1, 3, 1, MOVEMENT_DIRECTION.horizontal, [1, 3]);
-  var movingSpider = new Spider(0, 5, 0.5, MOVEMENT_DIRECTION.horizontal, [0, 5]);
-  allEnemies.push(enemy1);
-  allEnemies.push(enemy2);
-  allEnemies.push(movingSpider);
+  BoardManager.beginCurrentLevel();
+  // // create two enemies
+  // var enemy1 = new Ghost(0, 5, 1);
+  // var enemy2 = new Spider(1, 3, 1, MOVEMENT_DIRECTION.horizontal, [1, 3]);
+  // var movingSpider = new Spider(0, 5, 0.5, MOVEMENT_DIRECTION.horizontal, [0, 5]);
+  // allEnemies.push(enemy1);
+  // allEnemies.push(enemy2);
+  // allEnemies.push(movingSpider);
 }
 
 
