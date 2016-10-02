@@ -22,6 +22,11 @@ var ENEMY_TYPE = {
   ghost: "ghost"
 };
 
+var MOVEMENT_DIRECTION = {
+  vertical: "vertical",
+  horizontal: "horizontal"
+};
+
 /*
  * ENTITY: Base class for Enemy and Player
  *
@@ -290,11 +295,47 @@ Zombie.prototype.constructor = Zombie;
 /*
  * Spider: an enemy spider
  */
-var Spider = function(x, y, speed) {
+var Spider = function(x, y, speed, movementDirection, movementRange) {
   Enemy.call(this, ENEMY_TYPE.spider, x, y, speed);
+  this.movingSpeed = speed;
+  this.movementDirection = movementDirection;
+  this.movementRange = movementRange;
 };
 Spider.prototype = Object.create(Enemy.prototype);
 Spider.prototype.constructor = Spider;
+Spider.prototype.update = function(dt) {
+  var ds, updatedLocation;
+  ds = this.currentSpeed * dt;
+
+  switch ( this.movementDirection ) {
+    case MOVEMENT_DIRECTION.horizontal:
+    this.location.x += ds;
+    updatedLocation = this.location.x;
+    break;
+
+    case MOVEMENT_DIRECTION.vertical:
+    this.location.y += ds;
+    updatedLocation = this.location.y;
+    break;
+
+    default:
+    console.warn("WARNING: movement direction ( " + this.movementDirection + " ) is an invalid movement direction.");
+  }
+
+  var spiderHasReachedEndOfWeb = ( updatedLocation <= this.movementRange[0] && this.currentSpeed < 0 ) ||
+                                 ( updatedLocation >= this.movementRange[1] && this.currentSpeed > 0 );
+  if ( spiderHasReachedEndOfWeb ) {
+    this.currentSpeed = 0;
+    var spider = this;
+    setTimeout(function() {
+      spider._changeDirection();
+    }, 1000);
+  }
+};
+Spider.prototype._changeDirection = function() {
+  this.movingSpeed *= -1;
+  this.currentSpeed = this.movingSpeed;
+};
 
 /*
  * Ghost: an enemy ghost
@@ -596,8 +637,8 @@ function init() {
 
   // create two enemies
   var enemy1 = new Ghost(0, 5, 1);
-  var enemy2 = new Spider(1, 3, 0);
-  var movingSpider = new Spider(0, 5, 0.5);
+  var enemy2 = new Spider(1, 3, 1, MOVEMENT_DIRECTION.horizontal, [1, 3]);
+  var movingSpider = new Spider(0, 5, 0.5, MOVEMENT_DIRECTION.horizontal, [0, 5]);
   allEnemies.push(enemy1);
   allEnemies.push(enemy2);
   allEnemies.push(movingSpider);
