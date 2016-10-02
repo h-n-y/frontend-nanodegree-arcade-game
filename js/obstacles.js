@@ -96,6 +96,40 @@ var OBSTACLE_TYPE = {
   };
 
   /*
+   * JackoLantern: A jack-o-lantern obstacle.
+   *
+   *  Class Hierarchy: Object > Entity > Rock > JackoLantern
+   *
+   */
+  var JackoLantern = function(x, y) {
+    Rock.call(this, null, x, y);
+    this.spriteURL = 'images/pumpkin.png';
+    this.collisionBox = {
+      width: 95,
+      height: 77,
+      center: {
+        x: ( this.location.x + 0.5 ) * CELL_WIDTH,
+        y: ( this.location.y + 0.5 ) * CELL_HEIGHT + 50
+      }
+    };
+  };
+  JackoLantern.prototype = Object.create(Rock.prototype);
+  JackoLantern.prototype.constructor = JackoLantern;
+
+  /*
+   *  Skull: A skull-shaped obstacle.
+   */
+  var Skull = function(x, y) {
+    Rock.call(this, null, x, y);
+    this.spriteURL = 'images/skull.png';
+    // this.collisionBox = {
+    //
+    // };
+  };
+  Skull.prototype = Object.create(Rock.prototype);
+  Skull.prototype.constructor = Skull;
+
+  /*
    * WEB: A sticky obstacle that hampers Player's movement.
    *
    *  Class Hierarchy: Object > Entity > Obstacle > Web
@@ -259,7 +293,9 @@ var OBSTACLE_TYPE = {
   window.Obstacles = {
     rock: Rock,
     web: Web,
-    laser: Laser
+    laser: Laser,
+    jackolantern: JackoLantern,
+    skull: Skull
   };
 
 }());

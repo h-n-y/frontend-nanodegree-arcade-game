@@ -61,6 +61,9 @@
       new Obstacles.web(2, 4),
       new Obstacles.web(3, 4),
 
+      new Obstacles.jackolantern(0, 0),
+      new Obstacles.skull(1, 0)
+
       //new Obstacles.rock(COLOR.gray, 2, 5),
       //new Obstacles.laser(COLOR.blue, 0, 4, 5)
 

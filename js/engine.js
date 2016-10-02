@@ -187,6 +187,8 @@ var Engine = (function(global) {
         'images/rock-blue.png',
         'images/rock-yellow.png',
         'images/Rock.png',
+        'images/pumpkin.png',
+        'images/skull.png',
 
         'images/dwarf-red.png',
         'images/dwarf-blue.png',
