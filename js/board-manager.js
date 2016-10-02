@@ -36,7 +36,9 @@
       'images/stone-block.png',
       'images/stone-block.png',
       'images/stone-block.png',
-      'images/grass-block.png'    // Bottom row is grass
+      'images/grass-block.png',    // Bottom row is grass
+      'images/grass-block.png',   // Bottom row is grass
+      'images/grass-block.png',    // Bottom row is grass
     ];
     return layout;
   };
@@ -118,7 +120,6 @@
     this.currentLevel             = 1;
     this.currentObstacleLayout    = this._initialObstacleLayout();
     this.currentCostumeLayout     = this._initialCostumeLayout();
-
     this._rowMap                  = new _RowMap();
   };
   BoardManager.prototype.playerCanOccupyLocation = function(location) {
@@ -253,6 +254,25 @@
       enemy.checkCollisions();
     });
   };
+  // Returns the current row and column dimensions of the board
+  BoardManager.prototype.boardDimensions = function() {
+    var numRows, numCols;
+
+    switch ( this.currentLevel ) {
+      case 1:
+      numRows = 7;
+      numCols = 8;
+      break;
+
+      default:
+      console.warn("WARNING: ( " + this.currentLevel + " ) is an invalid level.");
+    }
+
+    return {
+      numRows: numRows,
+      numCols: numCols
+    };
+  };
   BoardManager.prototype.renderBoard = function() {
     this._renderRows();
     this._renderObstacles();
@@ -260,11 +280,12 @@
   };
   BoardManager.prototype._renderRows = function() {
     // Get image urls for all of the board's rows
-    var rowImageURLs = this._rowLayout();
-
+    var rowImageURLs, boardDimensions;
+    rowImageURLs = this._rowLayout();
+    boardDimensions = this.boardDimensions();
     // Draw the rows
-    for ( var row = 0; row < numRows; ++row ) {
-      for ( var col = 0; col < numCols; ++col ) {
+    for ( var row = 0; row < boardDimensions.numRows; ++row ) {
+      for ( var col = 0; col < boardDimensions.numCols; ++col ) {
         ctx.drawImage(Resources.get(rowImageURLs[row]), col * CELL_WIDTH, row * CELL_HEIGHT);
       }
     }

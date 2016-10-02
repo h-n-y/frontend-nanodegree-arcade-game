@@ -331,6 +331,8 @@ Spider.prototype.update = function(dt) {
       spider._changeDirection();
     }, 1000);
   }
+
+  this._updateCollisionBox();
 };
 Spider.prototype._changeDirection = function() {
   this.movingSpeed *= -1;
@@ -595,6 +597,7 @@ Player.prototype.handleInput = function(direction) {
       break;
 
       case 'right':
+      var numCols = BoardManager.boardDimensions().numCols;
       proposedLocation = { x: this.location.x + 1, y: this.location.y };
       var canMoveRight = this.location.x < numCols - 1 && BoardManager.playerCanOccupyLocation(proposedLocation);
       if ( canMoveRight ) {
@@ -613,6 +616,7 @@ Player.prototype.handleInput = function(direction) {
       break;
 
       case 'down':
+      var numRows = BoardManager.boardDimensions().numRows;
       proposedLocation = { x: this.location.x, y: this.location.y + 1 };
       var canMoveDown = this.location.y < numRows - 1 && BoardManager.playerCanOccupyLocation(proposedLocation);
       if ( canMoveDown ) {

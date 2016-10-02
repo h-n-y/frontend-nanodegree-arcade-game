@@ -17,9 +17,9 @@
 // The number of rows and columns on the board.
 // These have been made global so the Player object can access
 // them when handling user input.
- var numRows, numCols;
- numRows = 6;
- numCols = 5;
+ // var numRows, numCols;
+ // numRows = 6;
+ // numCols = 5;
 
 
 var Engine = (function(global) {
@@ -33,8 +33,8 @@ var Engine = (function(global) {
         ctx = canvas.getContext('2d'),
         lastTime;
 
-    canvas.width = 505;
-    canvas.height = 606;
+    canvas.width = 101 * BoardManager.boardDimensions().numRows;//505;
+    canvas.height = 101 * BoardManager.boardDimensions().numCols;//606;
     doc.body.appendChild(canvas);
 
     /* This function serves as the kickoff point for the game loop itself
