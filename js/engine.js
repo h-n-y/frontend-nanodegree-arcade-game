@@ -173,40 +173,50 @@ var Engine = (function(global) {
      * all of these images are properly loaded our game will start.
      */
     Resources.load([
+
         'images/stone-block.png',
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
         'images/char-boy.png',
 
-        'images/glasses-red.png',
-        'images/glasses-blue.png',
-        'images/glasses-yellow.png',
 
+        // OBSTACLES
+        // Rocks
         'images/rock-red.png',
         'images/rock-blue.png',
         'images/rock-yellow.png',
         'images/Rock.png',
         'images/pumpkin.png',
         'images/skull.png',
+        // Lasers
+        'images/laser-left.png',
+        'images/laser-right.png',
+        // Spider Web
+        'images/web.png',
 
+        // COSTUMES
+        // LaserMan
+        'images/glasses-red.png',
+        'images/glasses-blue.png',
+        'images/glasses-yellow.png',
+        // Dwarf
         'images/dwarf-red.png',
         'images/dwarf-blue.png',
         'images/dwarf-yellow.png',
-
+        // Ghost
         'images/ghost-costume.png',
 
-        'images/laser-left.png',
-        'images/laser-right.png',
-
-        'images/web.png',
-
+        // ENEMIES
         'images/ghost-left.png',
         'images/ghost-left-attacking.png',
         'images/ghost-right.png',
         'images/ghost-right-attacking.png',
         'images/spider.png',
         'images/zombie.png',
+
+        // Level finish
+        'images/selector.png',
     ]);
     Resources.onReady(init);
 

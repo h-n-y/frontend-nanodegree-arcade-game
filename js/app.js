@@ -454,23 +454,10 @@ var Player = function(spriteURL, x, y) {
     hasAttemptedToMove: false
   };
   this.collisionBox;
-  //this._setCollisionBox();
   this._updateCollisionBox();
 };
 Player.prototype = Object.create(Entity.prototype);
 Player.prototype.constructor = Player;
-// Player.prototype._setCollisionBox = function() {
-//   var verticalAdjustment = SPRITE_Y_POSITION_ADJUST + 75;
-//
-//   this.collisionBox = {
-//     width: 50,
-//     height: 80,
-//     center: {
-//       x: ( this.location.x + 0.5 ) * CELL_WIDTH,
-//       y: ( this.location.y + 0.5 ) * CELL_HEIGHT + verticalAdjustment
-//     }
-//   };
-// };
 Player.prototype._updateCollisionBox = function() {
   var x, y, width, height, verticalAdjustment;
   verticalAdjustment = SPRITE_Y_POSITION_ADJUST + 70;

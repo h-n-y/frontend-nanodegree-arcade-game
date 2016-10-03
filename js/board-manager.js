@@ -29,6 +29,9 @@
     return Math.floor(Math.random() * ( large - small + 1)) + small;
   }
 
+  /*
+   * EnemyGenerator: Generates the enemies for each level.
+   */
   var EnemyGenerator = function(level) {
     this.currentLevel = level;
     this.nextEnemyID = 0;
@@ -59,9 +62,8 @@
     delays = [1000, 1500, 2000];
 
     var self = this;
-    // Generate future enemies 
+    // Generate future enemies
     setInterval(function() {
-      // Random integer in [0, 1]
       var zombie = new Zombie(column, rows[randomIntegerInRange(0, 1)], speeds[randomIntegerInRange(0, 1)]);
       zombie.id = self.nextEnemyID++;
       allEnemies.push(zombie);
@@ -151,7 +153,8 @@
 
     player.endLaserShieldAnimation();
 
-    // Check if player has picked up the Candy to complete the level
+
+
     // TODO
 
     // Check if player has picked up a new costume
@@ -175,23 +178,31 @@
 
     // Check if player has run into an obstacle
     var obstacle = this._obstacleAtLocation(location);
-    if ( !obstacle ) return;
+    if ( obstacle ) {
+      switch ( obstacle.type ) {
+        case OBSTACLE_TYPE.rock:
+        handleRockCollision.call(this);
+        break;
 
+        case OBSTACLE_TYPE.laser:
+        handleLaserCollision.call(this);
+        break;
 
-    switch ( obstacle.type ) {
-      case OBSTACLE_TYPE.rock:
-      handleRockCollision.call(this);
-      break;
-
-      case OBSTACLE_TYPE.laser:
-      handleLaserCollision.call(this);
-      break;
-
-      case OBSTACLE_TYPE.web:
-      handleWebCollision.call(this);
-      break;
-
+        case OBSTACLE_TYPE.web:
+        handleWebCollision.call(this);
+        break;
+      }
     }
+
+    // Check if player has completed the level
+    var levelFinishLocation, playerCompletedLevel;
+    levelFinishLocation = this.currentLevelMap.playerFinish;
+    playerCompletedLevel = ( player.location.x === levelFinishLocation.x && player.location.y === levelFinishLocation.y );
+    if ( playerCompletedLevel ) {
+      // TODO go to next level
+      console.log("PLAYER COMPLETED LEVEL");
+    }
+
 
     // The player has smashed the rock.
     // Remove the rock from the board and animate its destruction.
@@ -253,6 +264,7 @@
   };
   BoardManager.prototype.renderBoard = function() {
     this._renderRows();
+    this._renderFinish();
     this._renderObstacles();
     this._renderCostumes();
   };
@@ -268,6 +280,13 @@
       }
     }
   }
+  BoardManager.prototype._renderFinish = function() {
+    var row, col;
+    row = this.currentLevelMap.playerFinish.y;
+    col = this.currentLevelMap.playerFinish.x;
+
+    ctx.drawImage(Resources.get('images/selector.png'), col * CELL_WIDTH, row * CELL_HEIGHT - 40);
+  };
   BoardManager.prototype._renderObstacles = function() {
 
     // Draw the obstacles to the canvas
