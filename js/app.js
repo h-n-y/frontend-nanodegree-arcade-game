@@ -172,7 +172,7 @@ var Enemy = function(type, x, y, speed) {
   this.type = type;
   this.currentSpeed = speed;
   // unique identifier for this enemy.
-  // Used when removing the enemy from the board and the global allEnemies array 
+  // Used when removing the enemy from the board and the global allEnemies array
   this.id;
 };
 Enemy.prototype = Object.create(Entity.prototype);
@@ -189,6 +189,7 @@ Enemy.prototype.update = function(dt) {
     this.location.x += ds;
 
     this._updateCollisionBox();
+    this._checkIfStillInBounds();
 };
 Enemy.prototype._updateCollisionBox = function() {
   var x, y, verticalAdjustment, width, height;
@@ -223,6 +224,22 @@ Enemy.prototype._updateCollisionBox = function() {
   this.collisionBox.center.y = y;
   this.collisionBox.width = width;
   this.collisionBox.height = height;
+};
+// Checks if enemy is still on the game board. If not, the enemy is removed
+// from the global allEnemies array to conserve memory.
+Enemy.prototype._checkIfStillInBounds = function() {
+  var outOfBounds = ( this.location.x <= -1 || this.location.x >= BoardManager.currentLevelMap.numCols ||
+                      this.location.y <= -1 || this.location.y >= BoardManager.currentLevelMap.numRows );
+  if ( outOfBounds ) {
+    var id, enemyIndex;
+    id = this.id;
+    enemyIndex = allEnemies.findIndex(function(enemy) {
+      return enemy.id === id;
+    });
+    if ( enemyIndex >= 0 ) {
+      allEnemies.splice(enemyIndex, 1);
+    }
+  }
 };
 Enemy.prototype.checkCollisions = function() {
   this.isColliding = false;
@@ -569,8 +586,8 @@ Player.prototype.handleInput = function(direction) {
   // ( A player can only move out of a spider web on the second attempt to move. )
   if ( player.webStatus.caughtInWeb && !player.webStatus.hasAttemptedToMove ) {
     player.webStatus.hasAttemptedToMove = true;
-    // Show web animation here
-    // TODO
+
+    // Show web animation
     var animation = new Animation.webStruggle(player.location.x, player.location.y);
     AnimationQueue.addAnimation(animation);
     return;
@@ -648,13 +665,6 @@ function init() {
   player = new Player('images/char-boy.png', playerStartLocation.x, playerStartLocation.y);
 
   BoardManager.beginCurrentLevel();
-  // // create two enemies
-  // var enemy1 = new Ghost(0, 5, 1);
-  // var enemy2 = new Spider(1, 3, 1, MOVEMENT_DIRECTION.horizontal, [1, 3]);
-  // var movingSpider = new Spider(0, 5, 0.5, MOVEMENT_DIRECTION.horizontal, [0, 5]);
-  // allEnemies.push(enemy1);
-  // allEnemies.push(enemy2);
-  // allEnemies.push(movingSpider);
 }
 
 

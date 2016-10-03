@@ -20,7 +20,7 @@
  */
 (function() {
 
-  // Returns a random integer in [left, right] assuming left < right
+  // Returns a random integer in [left, right] assuming left <= right
   function randomIntegerInRange(left, right) {
     var small, large;
     small = Math.min(left, right);
@@ -52,15 +52,19 @@
     zombie2.id = this.nextEnemyID++;
     allEnemies = [zombie1, zombie2];
 
-    var rows, speeds, delays;
+    var column, rows, speeds, delays;
+    column = -1;
     rows = [1, 2];
     speeds = [1, 2];
     delays = [1000, 1500, 2000];
 
+    var self = this;
+    // Generate future enemies 
     setInterval(function() {
       // Random integer in [0, 1]
-      //var randomIndex = Math.floor(Math.random() * 2);
-      allEnemies.push(new Zombie(-1, rows[randomIntegerInRange(0, 1)], speeds[randomIntegerInRange(0, 1)]));
+      var zombie = new Zombie(column, rows[randomIntegerInRange(0, 1)], speeds[randomIntegerInRange(0, 1)]);
+      zombie.id = self.nextEnemyID++;
+      allEnemies.push(zombie);
     }, delays[randomIntegerInRange(0, 2)]);
   };
 
