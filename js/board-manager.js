@@ -35,10 +35,15 @@
   var EnemyGenerator = function(level) {
     this.currentLevel = level;
     this.nextEnemyID = 0;
+    this.generatorInterval = null;
   };
   EnemyGenerator.prototype.generate = function() {
     switch ( this.currentLevel ) {
       case 1:
+      this._generateLevel1();
+      break;
+
+      case 2:
       this._generateLevel1();
       break;
 
@@ -63,7 +68,7 @@
 
     var self = this;
     // Generate future enemies
-    setInterval(function() {
+    this.generatorInterval = setInterval(function() {
       var zombie = new Zombie(column, rows[randomIntegerInRange(0, 1)], speeds[randomIntegerInRange(0, 1)]);
       zombie.id = self.nextEnemyID++;
       allEnemies.push(zombie);
@@ -110,9 +115,21 @@
   BoardManager.prototype.beginCurrentLevel = function() {
     // Update level map for the new level
     this.currentLevelMap = this._levelMapForLevel(this.currentLevel);
+
+    // Update player location
+    var playerStart = this.currentLevelMap.playerStart;
+    player.location.x = playerStart.x;
+    player.location.y = playerStart.y;
+
     // Begin generating enemies for this level.
+    clearInterval(this._enemyGenerator.generatorInterval);
+    allEnemies = [];
     this._enemyGenerator.currentLevel = this.currentLevel;
     this._enemyGenerator.generate();
+  };
+  BoardManager.prototype.beginNextLevel = function() {
+    ++this.currentLevel;
+    this.beginCurrentLevel();
   };
   BoardManager.prototype.playerCanOccupyLocation = function(location) {
     var allObstacles, rocks, lasers;
@@ -153,8 +170,8 @@
 
     player.endLaserShieldAnimation();
 
-    this._checkForCostumePickup();
-    this._checkForObstacleCollision();
+    this._checkForCostumePickup(location);
+    this._checkForObstacleCollision(location);
     this._checkForLevelCompletion();
   };
   BoardManager.prototype._checkForCostumePickup = function() {
@@ -243,6 +260,7 @@
     if ( playerCompletedLevel ) {
       // TODO go to next level
       console.log("PLAYER COMPLETED LEVEL");
+      this.beginNextLevel();
     }
   };
   BoardManager.prototype.updateCostumes = function(dt) {
@@ -331,6 +349,8 @@
     var levelMap;
 
     switch ( levelNum ) {
+
+      // Simple level: zombies only
       case 1:
       levelMap = {
         numCols: 4,
@@ -353,6 +373,38 @@
         costumeLayout: []
       }
       break;
+
+      case 2:
+      levelMap = {
+        numCols: 5,
+        numRows: 5,
+        playerStart: {
+          x: 4,
+          y: 2
+        },
+        playerFinish: {
+          x: 4,
+          y: 0
+        },
+        rowLayout: [
+          'images/grass-block.png',
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/water-block.png'
+        ],
+        obstacleLayout: [
+
+          new Obstacles.rock(COLOR.gray, 4, 1),
+          new Obstacles.rock(COLOR.gray, 3, 2),
+        ],
+        costumeLayout: []
+      }
+      break;
+
+      default:
+      console.warn("WARNING: Level ( " + levelNum + " ) is not a valid level.");
+
     }
 
     return levelMap;
