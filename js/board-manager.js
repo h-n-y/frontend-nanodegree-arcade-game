@@ -153,13 +153,13 @@
 
     player.endLaserShieldAnimation();
 
-
-
-    // TODO
-
+    this._checkForCostumePickup();
+    this._checkForObstacleCollision();
+    this._checkForLevelCompletion();
+  };
+  BoardManager.prototype._checkForCostumePickup = function() {
     // Check if player has picked up a new costume
     var costume;
-    //for ( var i = 0; i < this.currentCostumeLayout.length; ++i ) {
     for ( var i = 0; i < this.currentLevelMap.costumeLayout.length; ++i ) {
       costume = this.currentCostumeLayout[i];
 
@@ -175,7 +175,8 @@
         break;
       }
     }
-
+  };
+  BoardManager.prototype._checkForObstacleCollision = function() {
     // Check if player has run into an obstacle
     var obstacle = this._obstacleAtLocation(location);
     if ( obstacle ) {
@@ -193,16 +194,6 @@
         break;
       }
     }
-
-    // Check if player has completed the level
-    var levelFinishLocation, playerCompletedLevel;
-    levelFinishLocation = this.currentLevelMap.playerFinish;
-    playerCompletedLevel = ( player.location.x === levelFinishLocation.x && player.location.y === levelFinishLocation.y );
-    if ( playerCompletedLevel ) {
-      // TODO go to next level
-      console.log("PLAYER COMPLETED LEVEL");
-    }
-
 
     // The player has smashed the rock.
     // Remove the rock from the board and animate its destruction.
@@ -242,6 +233,16 @@
     function handleWebCollision() {
       player.webStatus.caughtInWeb = true;
       player.webStatus.hasAttemptedToMove = false;
+    }
+  };
+  BoardManager.prototype._checkForLevelCompletion = function() {
+    // Check if player has completed the level
+    var levelFinishLocation, playerCompletedLevel;
+    levelFinishLocation = this.currentLevelMap.playerFinish;
+    playerCompletedLevel = ( player.location.x === levelFinishLocation.x && player.location.y === levelFinishLocation.y );
+    if ( playerCompletedLevel ) {
+      // TODO go to next level
+      console.log("PLAYER COMPLETED LEVEL");
     }
   };
   BoardManager.prototype.updateCostumes = function(dt) {
