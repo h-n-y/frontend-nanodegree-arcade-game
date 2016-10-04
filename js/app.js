@@ -242,26 +242,35 @@ Enemy.prototype._checkIfStillInBounds = function() {
   }
 };
 Enemy.prototype.checkCollisions = function() {
+
   this.isColliding = false;
 
-  // Get all rock and laser obstacles
-  var obstacles = BoardManager.currentLevelMap.obstacleLayout.filter(function(obstacle) {
-    return obstacle.type !== OBSTACLE_TYPE.web;
-  });
-  // var obstacles = BoardManager.currentObstacleLayout.filter(function(obstacle) {
-  //   return obstacle.type !== OBSTACLE_TYPE.web;
-  // });
+  // Check collisions with rock and laser obstacles, only if enemy is NOT
+  // a ghost - ghosts can pass throught these obstacles and will never
+  // collide with them.
+  var enemyIsNotGhost = !(this.type === ENEMY_TYPE.ghost);
+  if ( enemyIsNotGhost ) {
 
-  // Check whether `this` has run into an obstacle
-  var obstacle;
-  for ( var i = 0; i < obstacles.length; ++i ) {
-    obstacle = obstacles[i];
-    if ( this.isCollidingWithEntity(obstacle) ) {
-      this.isColliding = true;
+    // Get all rock and laser obstacles
+    var obstacles = BoardManager.currentLevelMap.obstacleLayout.filter(function(obstacle) {
+      return obstacle.type !== OBSTACLE_TYPE.web;
+    });
 
-      // Change enemy direction after it 'hits' the obstacle
-      this._changeDirection();
-      break;
+    // Check whether `this` has run into an obstacle
+    var obstacle;
+    for ( var i = 0; i < obstacles.length; ++i ) {
+      obstacle = obstacles[i];
+      if ( this.isCollidingWithEntity(obstacle) ) {
+        this.isColliding = true;
+
+        // Change enemy direction after it 'hits' the obstacle
+        this._changeDirection();
+        // NOTE
+        // This is just a precaution to move the enemy's collision box out of the obstacle it's
+        // collided with to avoid glitching.
+        this.location.x += this.currentSpeed * 0.05;
+        break;
+      }
     }
   }
 
@@ -369,6 +378,7 @@ var Ghost = function(x, y, speed) {
   Enemy.call(this, ENEMY_TYPE.ghost, x, y, speed);
   this.normalSpeed = speed;
   this.attackSpeed = 2 * speed;
+  this._updateSpriteURL();
 };
 Ghost.prototype = Object.create(Enemy.prototype);
 Ghost.prototype.constructor = Ghost;
@@ -397,7 +407,7 @@ Ghost.prototype.update = function(dt) {
 };
 Ghost.prototype._updateSpriteURL = function() {
   var spriteURL;
-  if ( this._movingRight ) {
+  if ( this._movingRight() ) {
     spriteURL = this._canSeePlayer() ? 'images/ghost-right-attacking.png' : 'images/ghost-right.png';
   } else {
     spriteURL = this._canSeePlayer() ? 'images/ghost-left-attacking.png' : 'images/ghost-left.png';
@@ -547,6 +557,20 @@ Player.prototype._laserManCostume = function() {
   return this.costumes.find(function(costume) {
     return costume.type === COSTUME_TYPE.laserman;
   });
+};
+Player.prototype.removeDwarfCostume = function() {
+  this._removeCostumeOfType(COSTUME_TYPE.dwarf);
+};
+Player.prototype.removeLaserManCostume = function() {
+  this._removeCostumeOfType(COSTUME_TYPE.laserman);
+};
+Player.prototype._removeCostumeOfType = function(type) {
+  var index = this.costumes.findIndex(function(costume) {
+    return costume.type === type;
+  });
+  if ( index >= 0 ) {
+    this.costumes.splice(index, 1);
+  }
 };
 Player.prototype.render = function() {
   this._draw();

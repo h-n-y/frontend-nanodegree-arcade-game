@@ -44,7 +44,27 @@
       break;
 
       case 2:
-      this._generateLevel1();
+      this._generateLevel2();
+      break;
+
+      case 3:
+      this._generateLevel3();
+      break;
+
+      case 4:
+      this._generateLevel4();
+      break;
+
+      case 5:
+      this._generateLevel5();
+      break;
+
+      case 6:
+      this._generateLevel6();
+      break;
+
+      case 7:
+      this._generateLevel7();
       break;
 
       default:
@@ -73,6 +93,107 @@
       zombie.id = self.nextEnemyID++;
       allEnemies.push(zombie);
     }, delays[randomIntegerInRange(0, 2)]);
+  };
+  EnemyGenerator.prototype._generateLevel2 = function() {
+    this._generateLevel1();
+  };
+  EnemyGenerator.prototype._generateLevel3 = function() {
+    // Set initial enemies for level
+    var zombie1, zombie2;
+    zombie1 = new Zombie(0, 1, 1);
+    zombie2 = new Zombie(-1, 2, 2);
+    zombie1.id = this.nextEnemyID++;
+    zombie2.id = this.nextEnemyID++;
+    allEnemies = [zombie1, zombie2];
+
+    var column, rows, speeds, delays;
+    column = -1;
+    rows = [1, 2];
+    speeds = [4, 6];
+    delays = [100, 250, 500];
+
+    var self = this;
+    // Generate future enemies
+    this.generatorInterval = setInterval(function() {
+      var zombie = new Zombie(column, rows[randomIntegerInRange(0, 1)], speeds[randomIntegerInRange(0, 1)]);
+      zombie.id = self.nextEnemyID++;
+      allEnemies.push(zombie);
+    }, delays[randomIntegerInRange(0, 2)]);
+  };
+  EnemyGenerator.prototype._generateLevel4 = function() {
+    // Create initial zombies
+    var zombie1, zombie2, zombie3;
+    zombie1 = new Zombie(1, 3, 1.5);
+    zombie2 = new Zombie(2, 0, 2);
+    zombie3 = new Zombie(4, 2, -2);
+    // Add zombies to global allZombies array
+    [zombie1, zombie2, zombie3].forEach(function(zombie) {
+      zombie.id = self.nextEnemyID++;
+      allEnemies.push(zombie);
+    });
+
+    var columns, rows, speeds, delays;
+    rows    = [ 0,  0,  2,  2,  3,  3];
+    columns = [-1, -1,  5,  5, -1, -1];
+    speeds  = [ 2,  1, -2, -1,  2,  1];
+    delays  = [ 100, 250, 500];
+
+    this.generatorInterval = setInterval(function() {
+      var randomIndex, zombie;
+      randIndex = randomIntegerInRange(0, 5);
+      zombie = new Zombie(columns[randIndex], rows[randIndex], speeds[randIndex]);
+      zombie.id = self.nextEnemyID++;
+      allEnemies.push(zombie);
+    }, delays[randomIntegerInRange(0, 2)]);
+  };
+  EnemyGenerator.prototype._generateLevel5 = function() {
+    var spider1, spider2;
+    spider1 = new Spider(0, 2, 1, MOVEMENT_DIRECTION.vertical, [1, 4]);
+    spider2 = new Spider(4, 3, -1, MOVEMENT_DIRECTION.vertical, [0, 3]);
+
+    allEnemies.push(spider1);
+    allEnemies.push(spider2);
+  };
+  EnemyGenerator.prototype._generateLevel6 = function() {
+    // Add spiders
+    var spider = new Spider(2, 4, 1, MOVEMENT_DIRECTION.horizontal, [2, 4]);
+    allEnemies.push(spider);
+
+    var speeds, delays;
+    speeds = [-0.8, -1.0];
+    delays = [2500, 2800];
+    this.generatorInterval = setInterval(function() {
+      var randIndex, zombie;
+      randIndex = randomIntegerInRange(0, 1);
+      zombie = new Zombie(6, 2, speeds[randIndex]);
+      zombie.id = self.nextEnemyID++;
+      allEnemies.push(zombie);
+    }, delays[randomIntegerInRange(0, 1)]);
+  };
+  EnemyGenerator.prototype._generateLevel7 = function() {
+    // Create initial ghosts
+    var ghost1, ghost2, ghost3;
+    ghost1 = new Ghost(1, 2, 1);
+    ghost2 = new Ghost(2, 3, 1);
+    ghost3 = new Ghost(0, 4, 1);
+    var self = this;
+    [ghost1, ghost2, ghost3].forEach(function(ghost) {
+      ghost.id = self.nextEnemyID++;
+      allEnemies.push(ghost);
+    });
+
+    var rows, delays;
+    cols   = [ 6, -1, -1,  6];
+    rows   = [ 1,  2,  3,  4];
+    speeds = [-1,  1,  1, -1];
+    delays = [1000, 1500];
+    this.generatorInterval = setInterval(function() {
+      var randIndex, ghost;
+      randIndex = randomIntegerInRange(0, 3);
+      ghost = new Ghost(cols[randIndex], rows[randIndex], speeds[randIndex]);
+      ghost.id = self.nextEnemyID++;
+      allEnemies.push(ghost);
+    }, delays[randomIntegerInRange(0, 1)]);
   };
 
   /*
@@ -114,12 +235,22 @@
   };
   BoardManager.prototype.beginCurrentLevel = function() {
     // Update level map for the new level
+
+
+    // DEVELOPMENT CODE  ONLY
+    // Used for quickly accessing specific levels
+    //this.currentLevel = 7;
+    // END DEVELOPMENT CODE ONLY
+
+
     this.currentLevelMap = this._levelMapForLevel(this.currentLevel);
 
     // Update player location
     var playerStart = this.currentLevelMap.playerStart;
     player.location.x = playerStart.x;
     player.location.y = playerStart.y;
+    // Remove player costumes
+    player.costumes = [];
 
     // Begin generating enemies for this level.
     clearInterval(this._enemyGenerator.generatorInterval);
@@ -174,17 +305,25 @@
     this._checkForObstacleCollision(location);
     this._checkForLevelCompletion();
   };
-  BoardManager.prototype._checkForCostumePickup = function() {
+  BoardManager.prototype._checkForCostumePickup = function(location) {
     // Check if player has picked up a new costume
     var costume;
     for ( var i = 0; i < this.currentLevelMap.costumeLayout.length; ++i ) {
-      costume = this.currentCostumeLayout[i];
+      costume = this.currentLevelMap.costumeLayout[i];
 
       // Check if player picked up this costume
       var playerPickedUpCostume = location.x === costume.location.x && location.y === costume.originalYLocation;
       if ( playerPickedUpCostume ) {
         // Remove costume from the board
-        this.currentCostumeLayout.splice(i, 1);
+        this.currentLevelMap.costumeLayout.splice(i, 1);
+
+        // Check if player is already wearing the same type of costume and remove it
+        // before adding the new costume.
+        if ( player._isDwarf() && costume.type === COSTUME_TYPE.dwarf ) {
+          player.removeDwarfCostume();
+        } else if ( player._isLaserMan() && costume.type === COSTUME_TYPE.laserman ) {
+          player.removeLaserManCostume();
+        }
 
         // Add costume to player
         player.costumes.push(costume);
@@ -193,7 +332,7 @@
       }
     }
   };
-  BoardManager.prototype._checkForObstacleCollision = function() {
+  BoardManager.prototype._checkForObstacleCollision = function(location) {
     // Check if player has run into an obstacle
     var obstacle = this._obstacleAtLocation(location);
     if ( obstacle ) {
@@ -219,10 +358,10 @@
       var rock = obstacle;
 
       // Remove rock
-      var rockIndex = this.currentObstacleLayout.findIndex(function(obstacle) {
+      var rockIndex = this.currentLevelMap.obstacleLayout.findIndex(function(obstacle) {
         return obstacle.location.x === rock.location.x && obstacle.location.y === rock.location.y;
       });
-      this.currentObstacleLayout.splice(rockIndex, 1);
+      this.currentLevelMap.obstacleLayout.splice(rockIndex, 1);
 
       // Animate rock destruction
       var animation = new Animation.rockSmash(rock.color, location.x, location.y);
@@ -356,7 +495,7 @@
         numCols: 4,
         numRows: 4,
         playerStart: {
-          x: 2,
+          x: 1,
           y: 3
         },
         playerFinish: {
@@ -374,6 +513,7 @@
       }
       break;
 
+      // Zombies bouncing off rocks
       case 2:
       levelMap = {
         numCols: 5,
@@ -397,6 +537,221 @@
 
           new Obstacles.rock(COLOR.gray, 4, 1),
           new Obstacles.rock(COLOR.gray, 3, 2),
+        ],
+        costumeLayout: []
+      }
+      break;
+
+      // Zombie Apocalypse
+      // Introduction to the Dwarf Costume
+      case 3:
+      levelMap = {
+        numCols: 5,
+        numRows: 5,
+        playerStart: {
+          x: 1,
+          y: 4
+        },
+        playerFinish: {
+          x: 0,
+          y: 0
+        },
+        rowLayout: [
+          'images/grass-block.png',
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/water-block.png'
+        ],
+        obstacleLayout: [
+
+          new Obstacles.rock(COLOR.red, 4, 0),
+          new Obstacles.rock(COLOR.gray, 3, 1),
+          new Obstacles.rock(COLOR.gray, 2, 2),
+          new Obstacles.rock(COLOR.gray, 3, 4),
+        ],
+        costumeLayout: [
+          new Costume.dwarf(COLOR.red, 4, 4)
+        ]
+      }
+      break;
+
+      // More rock smashing with the Dwarf
+      case 4:
+      levelMap = {
+        numCols: 5,
+        numRows: 5,
+        playerStart: {
+          x: 1,
+          y: 4
+        },
+        playerFinish: {
+          x: 4,
+          y: 0
+        },
+        rowLayout: [
+          'images/stone-block.png',
+          'images/grass-block.png',
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/water-block.png'
+        ],
+        obstacleLayout: [
+
+          new Obstacles.rock(COLOR.red, 4, 1),
+
+          new Obstacles.rock(COLOR.gray, 3, 0),
+          new Obstacles.rock(COLOR.gray, 2, 3),
+          new Obstacles.rock(COLOR.gray, 2, 4),
+          new Obstacles.rock(COLOR.gray, 4, 3),
+        ],
+        costumeLayout: [
+          new Costume.dwarf(COLOR.red, 4, 4)
+        ]
+      }
+      break;
+
+      // Jack-o-Lanterns and Skulls
+      case 5:
+      levelMap = {
+        numCols: 5,
+        numRows: 7,
+        playerStart: {
+          x: 2,
+          y: 6
+        },
+        playerFinish: {
+          x: 2,
+          y: 0
+        },
+        rowLayout: [
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/grass-block.png'
+        ],
+        obstacleLayout: [
+
+          new Obstacles.rock(COLOR.gray, 0, 5),
+          new Obstacles.rock(COLOR.gray, 0, 6),
+          new Obstacles.rock(COLOR.gray, 4, 5),
+          new Obstacles.rock(COLOR.gray, 4, 6),
+
+          new Obstacles.jackolantern(1, 5),
+          new Obstacles.jackolantern(1, 3),
+          new Obstacles.jackolantern(1, 1),
+          new Obstacles.jackolantern(3, 5),
+          new Obstacles.jackolantern(3, 3),
+          new Obstacles.jackolantern(3, 1),
+
+          new Obstacles.skull(1, 4),
+          new Obstacles.skull(1, 2),
+          new Obstacles.skull(1, 0),
+          new Obstacles.skull(3, 4),
+          new Obstacles.skull(3, 2),
+          new Obstacles.skull(3, 0),
+
+          new Obstacles.web(0, 0),
+          new Obstacles.web(0, 1),
+          new Obstacles.web(0, 2),
+          new Obstacles.web(0, 3),
+          new Obstacles.web(0, 4),
+          new Obstacles.web(4, 0),
+          new Obstacles.web(4, 1),
+          new Obstacles.web(4, 2),
+          new Obstacles.web(4, 3),
+          new Obstacles.web(4, 4),
+        ],
+        costumeLayout: []
+      }
+      break;
+
+      // Hello Spiders
+      case 6:
+      levelMap = {
+        numCols: 6,
+        numRows: 6,
+        playerStart: {
+          x: 0,
+          y: 5
+        },
+        playerFinish: {
+          x: 5,
+          y: 0
+        },
+        rowLayout: [
+          'images/grass-block.png',
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/stone-block.png',
+          'images/water-block.png'
+        ],
+        obstacleLayout: [
+
+          new Obstacles.rock(COLOR.gray, 0, 1),
+          new Obstacles.rock(COLOR.gray, 1, 4),
+
+          new Obstacles.rock(COLOR.red, 0, 4),
+          new Obstacles.rock(COLOR.red, 5, 4),
+          new Obstacles.rock(COLOR. red, 4, 5),
+
+          new Obstacles.rock(COLOR.yellow, 1, 1),
+
+          new Obstacles.laser(COLOR.red, 1, 3, 3),
+          new Obstacles.laser(COLOR.red, 2, 5, 1),
+
+          new Obstacles.web(2, 4),
+          new Obstacles.web(3, 4),
+          new Obstacles.web(4, 4),
+        ],
+        costumeLayout: [
+          new Costume.dwarf(COLOR.red, 0, 3),
+          new Costume.dwarf(COLOR.yellow, 5, 5),
+        ]
+      }
+      break;
+
+      // Ghosts
+      case 7:
+      levelMap = {
+        numCols: 6,
+        numRows: 6,
+        playerStart: {
+          x: 4,
+          y: 5
+        },
+        playerFinish: {
+          x: 0,
+          y: 0
+        },
+        rowLayout: [
+          'images/stone-block.png',
+          'images/grass-block.png',
+          'images/grass-block.png',
+          'images/grass-block.png',
+          'images/grass-block.png',
+          'images/stone-block.png',
+        ],
+        obstacleLayout: [
+
+          new Obstacles.rock(COLOR.gray, 0, 1),
+          new Obstacles.rock(COLOR.gray, 1, 4),
+
+          new Obstacles.rock(COLOR.gray, 0, 1),
+          new Obstacles.rock(COLOR.gray, 2, 2),
+          new Obstacles.rock(COLOR.gray, 3, 2),
+          new Obstacles.rock(COLOR.gray, 5, 3),
+
+          new Obstacles.skull(3, 0),
+          new Obstacles.skull(1, 3),
+          new Obstacles.skull(4, 4),
+
+          new Obstacles.jackolantern(1, 1),
+          new Obstacles.jackolantern(3, 4),
         ],
         costumeLayout: []
       }
