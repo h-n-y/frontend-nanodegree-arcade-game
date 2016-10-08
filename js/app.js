@@ -683,15 +683,23 @@ function init() {
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keydown', function(e) {
-    var allowedKeys = {
-        37: 'left',
-        38: 'up',
-        39: 'right',
-        40: 'down'
-    };
+  var space = 32;
+  if ( e.keyCode === space ) {
+    console.log("space bar pressed");
+    PopoverManager.removePopover();
+    return;
+  }
 
-    player.handleInput(allowedKeys[e.keyCode]);
+  var allowedKeys = {
+      37: 'left',
+      38: 'up',
+      39: 'right',
+      40: 'down'
+  };
+
+  player.handleInput(allowedKeys[e.keyCode]);
 });
+
 
 //init();
 

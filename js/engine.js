@@ -188,6 +188,7 @@ var Engine = /*(*/function(global) {
         'images/enemy-bug.png',
         'images/char-boy.png',
 
+        'images/jack.png',
 
         // OBSTACLES
         // Rocks
