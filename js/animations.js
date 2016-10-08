@@ -228,7 +228,7 @@
 
   /*
    * LaserShield: Animation for the shield that surrounds the player while
-   *      that player is passing throught a laser beam in a LaserMan costume.
+   *      that player is passing through a laser beam in a LaserMan costume.
    */
   var LaserShield = function(color, x, y) {
     Animation.call(this, x, y);
