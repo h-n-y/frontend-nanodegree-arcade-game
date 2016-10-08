@@ -1,4 +1,23 @@
 body {
     text-align: center;
     font-family: 'Amatic SC', cursive;
+    /*background-color: #474651;*/
+}
+
+canvas {
+  display: block;
+  margin: 0 auto;
+}
+#game-start-popover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+#popover {
+  position: relative;
+  /*top: 0;
+  left: 0;
+  right: 0;*/
+  /*background-color: rgba(0, 255, 180, 0.5);*/
 }

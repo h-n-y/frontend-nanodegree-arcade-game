@@ -693,4 +693,8 @@ document.addEventListener('keydown', function(e) {
     player.handleInput(allowedKeys[e.keyCode]);
 });
 
-init();
+//init();
+
+window.onload = function() {
+  init();
+};

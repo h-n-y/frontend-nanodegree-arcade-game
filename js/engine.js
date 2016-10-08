@@ -22,7 +22,8 @@
  // numCols = 5;
 
 
-var Engine = (function(global) {
+
+var Engine = /*(*/function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
@@ -35,7 +36,8 @@ var Engine = (function(global) {
 
     canvas.width = 101 * BoardManager.boardDimensions().numCols;//505;
     canvas.height = 101 * BoardManager.boardDimensions().numRows;//606;
-    doc.body.appendChild(canvas);
+    //doc.body.appendChild(canvas);
+    doc.getElementById("container").appendChild(canvas);
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
@@ -75,6 +77,7 @@ var Engine = (function(global) {
         reset();
         lastTime = Date.now();
         BoardManager.currentLevel = 1;
+        PopoverManager.showGameStartPopover();
         main();
     }
 
@@ -230,4 +233,4 @@ var Engine = (function(global) {
      * from within their app.js files.
      */
     global.ctx = ctx;
-})(this);
+}/*)(this)*/;
