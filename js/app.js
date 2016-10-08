@@ -69,7 +69,7 @@ Entity.prototype._draw = function() {
 Entity.prototype.render = function() {
   this._draw();
   // for debugging only
-  this._renderCollisionBox();
+  //this._renderCollisionBox();
 }
 // Updates any data or properties associated with the Entity.
 // Initiated by the game loop and called continuously.
@@ -574,7 +574,8 @@ Player.prototype._removeCostumeOfType = function(type) {
 };
 Player.prototype.render = function() {
   this._draw();
-  this._renderCollisionBox();
+  // Development only
+  //this._renderCollisionBox();
 };
 Player.prototype.startLaserShieldAnimation = function() {
 

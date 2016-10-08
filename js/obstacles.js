@@ -92,7 +92,8 @@ var OBSTACLE_TYPE = {
   Rock.prototype.render = function() {
     Entity.prototype.render.call(this);
 
-    this._renderCollisionBox();
+    // Development only
+    //this._renderCollisionBox();
   };
 
   /*
@@ -203,8 +204,8 @@ var OBSTACLE_TYPE = {
 
     this._renderLaserBeam();
     this._renderLaserNodes();
-    // for debugging only
-    this._renderCollisionBox();
+    // for development only
+    //this._renderCollisionBox();
   };
   Laser.prototype._renderLaserBeam = function() {
     var x, y, verticalAdjustment;
