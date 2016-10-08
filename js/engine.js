@@ -95,6 +95,7 @@ var Engine = /*(*/function(global) {
         updateEntities(dt);
         updateCollectibles(dt);
         updateAnimations(dt);
+        updatePopover(dt);
         checkCollisions();
     }
 
@@ -126,6 +127,10 @@ var Engine = /*(*/function(global) {
       AnimationQueue.update(dt);
     }
 
+    function updatePopover(dt) {
+      window.PopoverManager.update(dt);
+    }
+
     function checkCollisions() {
       BoardManager.checkEnemyCollisions();
     }
@@ -140,6 +145,7 @@ var Engine = /*(*/function(global) {
         renderBoard();
         renderAnimations();
         renderEntities();
+        renderPopover();
     }
 
     function renderBoard() {
@@ -165,6 +171,10 @@ var Engine = /*(*/function(global) {
         });
 
         player.render();
+    }
+
+    function renderPopover() {
+      PopoverManager.render();
     }
 
 

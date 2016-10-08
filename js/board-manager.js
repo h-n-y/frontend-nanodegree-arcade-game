@@ -413,6 +413,10 @@
     this.currentLevel = 1;
     this.currentLevelMap = this._levelMapForLevel(this.currentLevel);
     this._enemyGenerator = new EnemyGenerator(this.currentLevel);
+
+    this._playerHasPickedUpDwarfCostume     = false;
+    this._playerHasPickedUpLaserManCostume  = false;
+    this._playerHasPickedUpGhostCostume     = false;
   };
   BoardManager.prototype.beginCurrentLevel = function() {
     // Update level map for the new level
@@ -509,8 +513,36 @@
         // Add costume to player
         player.costumes.push(costume);
 
+        // Display costume popup if player has picked up this costume
+        // for the first time
+        this._conditionallyDisplayPopoverForCostume(costume);
+
         break;
       }
+    }
+  };
+  BoardManager.prototype._conditionallyDisplayPopoverForCostume = function(costume) {
+    switch ( costume.type ) {
+      case COSTUME_TYPE.dwarf:
+      if ( !this._playerHasPickedUpDwarfCostume ) {
+        this._playerHasPickedUpDwarfCostume = true;
+        PopoverManager.presentDwarfPopover();
+      }
+      break;
+
+      case COSTUME_TYPE.laserman:
+      if ( !this._playerHasPickedUpLaserManCostume ) {
+        this._playerHasPickedUpLaserManCostume = true;
+        PopoverManager.presentLaserManPopover();
+      }
+      break;
+
+      case COSTUME_TYPE.ghost:
+      if ( !this._playerHasPickedUpGhostCostume ) {
+        this._playerHasPickedUpGhostCostume = true;
+        PopoverManager.presentGhostPopover();
+      }
+      break;
     }
   };
   BoardManager.prototype._checkForObstacleCollision = function(location) {
