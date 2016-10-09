@@ -167,6 +167,8 @@ var OBSTACLE_TYPE = {
     this.SPRITE_URL_RIGHT_LASERNODE = 'images/laser-right.png';
     this.laserNodeCollisionBoxes;
     this._setLaserNodeCollisionBoxes();
+    this.laserBeamParticle;
+    this._setLaserBeamParticle();
   };
   Laser.prototype = Object.create(Obstacle.prototype);
   Laser.prototype.constructor = Laser;
@@ -196,6 +198,31 @@ var OBSTACLE_TYPE = {
       }
     };
   };
+  Laser.prototype._setLaserBeamParticle = function() {
+    var verticalAdjustment = SPRITE_Y_POSITION_ADJUST + 110;
+
+    this.laserBeamParticle = {
+      width: 0.7 * CELL_WIDTH,
+      height: 10,
+      color: this.beamColor.rgb,
+      center: {
+        x: ( this.locationLeftLaserNode + 0.5 ) * CELL_WIDTH,
+        y: this.y * CELL_HEIGHT + verticalAdjustment
+      },
+      maxLeft: ( this.locationLeftLaserNode + 0.5 ) * CELL_WIDTH,
+      maxRight: ( this.locationRightLaserNode + 0.5 ) * CELL_WIDTH,
+      update: function(dt) {
+        var dx, maxDX, frequencyControl;
+        maxDX = this.maxRight - this.maxLeft;
+        frequencyControl = 50;
+        dx = Math.abs(maxDX * Math.sin(Date.now() / frequencyControl));
+        this.center.x = this.maxLeft + dx;
+      }
+    };
+  };
+  Laser.prototype.update = function(dt) {
+    this.laserBeamParticle.update(dt);
+  };
   Laser.prototype.render = function() {
     if ( this.locationLeftLaserNode.x !== this.locationRightLaserNode.x ) {
       console.warn("WARNING: Laser's nodes are not on the same row - will not render.");
@@ -208,25 +235,14 @@ var OBSTACLE_TYPE = {
     //this._renderCollisionBox();
   };
   Laser.prototype._renderLaserBeam = function() {
-    var x, y, verticalAdjustment;
-    verticalAdjustment = SPRITE_Y_POSITION_ADJUST + 105;
-
-    // Draw laser beam
-    var laserbeamWidth, laserbeamHeight;
     ctx.save();
 
-
-    ctx.fillStyle = "blue";
-    x = ( this.locationLeftLaserNode + 0.75 ) * CELL_WIDTH;
-    y = this.y * CELL_HEIGHT + verticalAdjustment;
-    laserbeamWidth = ( this.locationRightLaserNode - this.locationLeftLaserNode - 0.5 ) * CELL_WIDTH;
-    laserbeamHeight = 20;
-
-    var gradient = ctx.createLinearGradient(x, y, x, y + laserbeamHeight);
-    gradient.addColorStop(0, "white");
-    gradient.addColorStop(1, this.beamColor.rgb);
-    ctx.fillStyle = gradient;
-    ctx.fillRect(x, y, laserbeamWidth, laserbeamHeight);
+    var laserBeamWidth, laserBeamHeight;
+    laserBeamWidth = this.laserBeamParticle.width;
+    laserBeamHeight = this.laserBeamParticle.height;
+    
+    ctx.fillStyle = this.laserBeamParticle.color;
+    ctx.fillRect(this.laserBeamParticle.center.x - laserBeamWidth / 2, this.laserBeamParticle.center.y - laserBeamHeight / 2, laserBeamWidth, laserBeamHeight);
 
     ctx.restore();
   };

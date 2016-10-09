@@ -469,7 +469,7 @@
     // Prevent player from moving into a location occupied by a
     // laser node.
     var lasers, laser;
-    lasers = this._laserObstacles();
+    lasers = this.laserObstacles();
     for ( var i = 0; i < lasers.length; ++i ) {
       laser = lasers[i];
 
@@ -679,7 +679,7 @@
     });
   };
   // Returns all of the laser obstacles currently on the board.
-  BoardManager.prototype._laserObstacles = function() {
+  BoardManager.prototype.laserObstacles = function() {
     return this.currentLevelMap.obstacleLayout.filter(function(obstacle) {
       return obstacle.type === OBSTACLE_TYPE.laser;
     });

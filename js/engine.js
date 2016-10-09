@@ -111,10 +111,18 @@ var Engine = /*(*/function(global) {
      * render methods.
      */
     function updateEntities(dt) {
+        // Update enemies
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
+
+        // Update player
         player.update();
+
+        // Update laser obstacles
+        BoardManager.laserObstacles().forEach(function(laser) {
+          laser.update(dt);
+        });
     }
 
     function updateCollectibles(dt) {
