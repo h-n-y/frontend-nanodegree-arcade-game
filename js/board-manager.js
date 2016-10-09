@@ -1387,6 +1387,7 @@
           new Obstacles.skull(2, 5),
           new Obstacles.skull(5, 2),
 
+          new Candy(2, 4),
         ],
         costumeLayout: [
 

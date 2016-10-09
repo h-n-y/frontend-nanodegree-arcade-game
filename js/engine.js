@@ -236,6 +236,8 @@ var Engine = /*(*/function(global) {
 
         // Level finish
         'images/selector.png',
+
+        'images/candy-corn.png',
     ]);
     Resources.onReady(init);
 

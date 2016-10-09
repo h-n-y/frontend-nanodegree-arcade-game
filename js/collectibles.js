@@ -57,8 +57,7 @@ var COSTUME_TYPE = {
    *  Class Hierarchy: Object > Entity > _Collectible > Candy
    */
   var Candy = function(x, y) {
-    // TODO: change spriteURL!
-    _Collectible.call(this, COLLECTIBLE_TYPE.candy, 'images/enemy-bug.png', x, y);
+    _Collectible.call(this, "candy", 'images/candy-corn.png', x, y);
   };
   Candy.prototype = Object.create(_Collectible.prototype);
   Candy.prototype.constructor = Candy;
