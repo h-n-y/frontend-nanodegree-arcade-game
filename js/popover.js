@@ -84,7 +84,7 @@ PopoverManager.prototype._setFireworks = function() {
   this.fireworks = {
     particle1: {
       // line width: 0 --> large
-      // alpha: large --> 0
+      // alpha: 1 --> 0
       radius: 50,
       lineWidth: 0,
       alpha: 1,
@@ -98,10 +98,10 @@ PopoverManager.prototype._setFireworks = function() {
         speed = 4;
         ds = speed * dt;
         this.lineWidth += 100 * ds;
-        this.alpha -= ds;
+        this.alpha = Math.max(0, this.alpha - ds);
 
         // Restart animation at a new random location
-        if ( this.alpha < 0 ) {
+        if ( this.alpha <= 0 ) {
           this.alpha = 1;
           this.lineWidth = 0;
           this.center.x = randomIntegerInRange(0, canvas.width);
@@ -111,7 +111,7 @@ PopoverManager.prototype._setFireworks = function() {
       }
     },
     particle2: {
-      // alpha: large --> 0
+      // alpha: 1 --> 0
       // radius: 0 --> large
       radius: 0,
       lineWidth: 10,
@@ -125,11 +125,11 @@ PopoverManager.prototype._setFireworks = function() {
         var speed, ds;
         speed = 5;
         ds = speed * dt;
-        this.alpha -= ds;
+        this.alpha = Math.max(0, this.alpha - ds);
         this.radius += 18 * ds;
 
         // Restart animation at a new random location
-        if ( this.alpha < 0 ) {
+        if ( this.alpha <= 0 ) {
           this.alpha = 1;
           this.radius = 0;
           this.center.x = randomIntegerInRange(0, canvas.width);
@@ -153,11 +153,11 @@ PopoverManager.prototype._setFireworks = function() {
         var speed, ds;
         speed = 20;
         ds = speed * dt;
-        this.lineWidth -= 3 * ds;
+        this.lineWidth = Math.max(0, this.lineWidth - 3 * ds);
         this.radius += 10 * ds;
 
         // Restart animation at a new random location
-        if ( this.lineWidth < 0 ) {
+        if ( this.lineWidth <= 0 ) {
           this.lineWidth = 15;
           this.radius = 0;
           this.center.x = randomIntegerInRange(0, canvas.width);
