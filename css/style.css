@@ -8,7 +8,8 @@ canvas {
   display: block;
   margin: 0 auto;
 }
-#game-start-popover {
+#game-start-popover,
+#game-end-popover {
   position: absolute;
   top: 0;
   left: 0;

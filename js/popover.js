@@ -3,7 +3,8 @@
 var POPOVER_COLORS = {
   blueGray: "rgb(71, 70, 81)",
   gray: "rgb(186, 186, 186)",
-  orange: "rgb(255, 184, 6)"
+  orange: "rgb(255, 184, 6)",
+  green: "rgb(171, 252, 170)"
 };
 
 var PopoverManager = function() {
@@ -46,6 +47,127 @@ PopoverManager.prototype.showGameStartPopover = function() {
   // Add image of Jack
   this.ctx.drawImage(Resources.get('images/jack.png'), horizontalCenter - 51, 60);
 };
+PopoverManager.prototype.presentGameFinishPopover = function() {
+  this._addCanvasToDOMWithID("game-end-popover");
+  this._setFireworks();
+
+  this._renderEndOfGamePopover();
+};
+PopoverManager.prototype._renderEndOfGamePopover = function() {
+  // Clear canvas
+  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+
+  // Set canvas dimensions
+  this.ctx.canvas.width = 1280;//720;
+  this.ctx.canvas.height = 700;//600;
+  var horizontalCenter = this.ctx.canvas.width / 2;
+  var verticalCenter = this.ctx.canvas.height / 2;
+
+  // add background
+  this.ctx.fillStyle = POPOVER_COLORS.blueGray;
+  this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+  // Print 'Happy Halloween'
+  this.ctx.font = "48pt Amatic SC";
+  this.ctx.textAlign = "center";
+  this.ctx.fillStyle = POPOVER_COLORS.orange;
+  this.ctx.fillText("Happy Halloween", horizontalCenter, verticalCenter);
+
+  // Render fireworks
+  this._renderFireworks();
+};
+PopoverManager.prototype._setFireworks = function() {
+  var canvas, colors;
+  canvas = this.ctx.canvas;
+  colors = ["white", POPOVER_COLORS.orange, POPOVER_COLORS.green]
+  colors = ["rgba(255, 255, 255, %alpha%)", "rgba(255, 184, 6, %alpha%)", "rgba(171, 252, 170, %alpha%)"];
+
+  this.fireworks = {
+    particle1: {
+      // line width: 0 --> large
+      // alpha: large --> 0
+      radius: 50,
+      lineWidth: 0,
+      alpha: 1,
+      center: {
+        x: 0,
+        y: 0
+      },
+      color: "rgba(255, 184, 6, %alpha%)",
+      update: function(dt) {
+        var speed, ds;
+        speed = 4;
+        ds = speed * dt;
+        this.lineWidth += 100 * ds;
+        this.alpha -= ds;
+
+        // Restart animation at a new random location
+        if ( this.alpha < 0 ) {
+          this.alpha = 1;
+          this.lineWidth = 0;
+          this.center.x = randomIntegerInRange(0, canvas.width);
+          this.center.y = randomIntegerInRange(0, canvas.height);
+          this.color = colors[randomIntegerInRange(0, colors.length - 1)];
+        }
+      }
+    },
+    particle2: {
+      // alpha: large --> 0
+      // radius: 0 --> large
+      radius: 0,
+      lineWidth: 10,
+      alpha: 1,
+      center: {
+        x: 0,
+        y: 0
+      },
+      color: "rgba(255, 184, 6, %alpha%)",
+      update: function(dt) {
+        var speed, ds;
+        speed = 5;
+        ds = speed * dt;
+        this.alpha -= ds;
+        this.radius += 18 * ds;
+
+        // Restart animation at a new random location
+        if ( this.alpha < 0 ) {
+          this.alpha = 1;
+          this.radius = 0;
+          this.center.x = randomIntegerInRange(0, canvas.width);
+          this.center.y = randomIntegerInRange(0, canvas.height);
+          this.color = colors[randomIntegerInRange(0, colors.length - 1)];
+        }
+      }
+    },
+    particle3: {
+      // line width: large --> 0
+      // radius: 0 --> large
+      radius: 0,
+      lineWidth: 20,
+      alpha: 1,
+      center: {
+        x: 0,
+        y: 0
+      },
+      color: "rgba(255, 184, 6, %alpha%)",
+      update: function(dt) {
+        var speed, ds;
+        speed = 20;
+        ds = speed * dt;
+        this.lineWidth -= 3 * ds;
+        this.radius += 10 * ds;
+
+        // Restart animation at a new random location
+        if ( this.lineWidth < 0 ) {
+          this.lineWidth = 15;
+          this.radius = 0;
+          this.center.x = randomIntegerInRange(0, canvas.width);
+          this.center.y = randomIntegerInRange(0, canvas.height);
+          this.color = colors[randomIntegerInRange(0, colors.length - 1)];
+        }
+      }
+    }
+  };
+};
 PopoverManager.prototype._addCanvasToDOMWithID = function(id) {
   // Create new canvas
   var popover = document.createElement('canvas');
@@ -57,7 +179,7 @@ PopoverManager.prototype._addCanvasToDOMWithID = function(id) {
   // If canvas is displaying a costume popover, set its width and
   // height to match the game board canvas dimensions
   if ( id === "costume-popover" ) {
-    popover.width = window.ctx.canvas.width;
+    popover.width  = window.ctx.canvas.width;
     popover.height = window.ctx.canvas.height;
   }
 };
@@ -68,18 +190,14 @@ PopoverManager.prototype._addCanvasToDOMWithID = function(id) {
 PopoverManager.prototype.presentLaserManPopover = function() {
   this._addCanvasToDOMWithID("costume-popover");
   this._setCostumeDataForCostume(COSTUME_TYPE.laserman);
-
 };
 PopoverManager.prototype.presentDwarfPopover = function() {
   this._addCanvasToDOMWithID("costume-popover");
   this._setCostumeDataForCostume(COSTUME_TYPE.dwarf);
-  //this.render();
-
 };
 PopoverManager.prototype.presentGhostPopover = function() {
   this._addCanvasToDOMWithID("costume-popover");
   this._setCostumeDataForCostume(COSTUME_TYPE.ghost);
-  //this.render();
 };
 PopoverManager.prototype.removePopover = function() {
   if ( this.ctx === null ) return;
@@ -89,14 +207,47 @@ PopoverManager.prototype.removePopover = function() {
   canvasContainer.removeChild(this.ctx.canvas);
   this.ctx = null;
 };
-PopoverManager.prototype.update = function() {
-  if ( !this._isDisplayingCostumePopover() ) return;
-
-  this.costumeData.update();
+PopoverManager.prototype.update = function(dt) {
+  if ( this._isDisplayingCostumePopover() ) {
+    this.costumeData.update();
+  } else if ( this._isDisplayingEndOfGamePopover() ) {
+    this._updateFireworks(dt);
+  }
 };
+PopoverManager.prototype._updateFireworks = function(dt) {
+  for ( var particle in this.fireworks ) {
+    if ( this.fireworks.hasOwnProperty(particle) ) {
+      this.fireworks[particle].update(dt);
+    }
+  }
+  //this.fireworks.particle1.update(dt);
+  // this.fireworks.particle2.update(dt);
+  // this.fireworks.particle3.update(dt);
+}
 PopoverManager.prototype.render = function() {
-  if ( !this._isDisplayingCostumePopover() ) return;
+  if ( this._isDisplayingCostumePopover() ) {
+    this._renderCostumePopover();
+  } else if ( this._isDisplayingEndOfGamePopover() ) {
+    //this._renderFireworks();
+    this._renderEndOfGamePopover();
+  }
+};
+PopoverManager.prototype._renderFireworks = function() {
 
+  var particle;
+
+  for ( var key in this.fireworks ) {
+    if ( this.fireworks.hasOwnProperty(key) ) {
+      particle = this.fireworks[key];
+      this.ctx.strokeStyle = particle.color.replace("%alpha%", particle.alpha);
+      this.ctx.lineWidth = particle.lineWidth;
+      this.ctx.beginPath();
+      this.ctx.arc(particle.center.x, particle.center.y, particle.radius, 0, 2 * Math.PI, true);
+      this.ctx.stroke();
+    }
+  }
+};
+PopoverManager.prototype._renderCostumePopover = function() {
   // Prevent window from scrolling down when this popover is added to the DOM
   window.scrollTo(0, 0);
   this.ctx.canvas.style.top = (-window.ctx.canvas.height).toString() + "px";
@@ -139,6 +290,9 @@ PopoverManager.prototype.render = function() {
 PopoverManager.prototype._isDisplayingCostumePopover = function() {
   return this.ctx !== null && this.ctx.canvas.id === "costume-popover";
   //return this.costumeData !== null || this.costumeData !== undefined;
+};
+PopoverManager.prototype._isDisplayingEndOfGamePopover = function() {
+  return this.ctx !== null && this.ctx.canvas.id === "game-end-popover";
 };
 PopoverManager.prototype._setCostumeDataForCostume = function(costume) {
   switch ( costume ) {

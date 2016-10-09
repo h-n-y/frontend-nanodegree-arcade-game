@@ -36,6 +36,7 @@ var Engine = /*(*/function(global) {
 
     canvas.width = 101 * BoardManager.boardDimensions().numCols;//505;
     canvas.height = 101 * BoardManager.boardDimensions().numRows;//606;
+    canvas.id = "game-board";
     //doc.body.appendChild(canvas);
     doc.getElementById("container").appendChild(canvas);
 
@@ -78,6 +79,7 @@ var Engine = /*(*/function(global) {
         lastTime = Date.now();
         BoardManager.currentLevel = 1;
         PopoverManager.showGameStartPopover();
+        //PopoverManager.presentGameFinishPopover();
         main();
     }
 

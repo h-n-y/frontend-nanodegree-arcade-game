@@ -707,13 +707,14 @@ LevelManager.prototype.levelMapForLevel = function(level) {
     break;
 
     default:
-    console.warn("WARNING: Level ( " + levelNum + " ) is not a valid level.");
+    console.warn("WARNING: Level ( " + level + " ) is not a valid level.");
 
   }
 
   return levelMap;
 };
 
+// Make an instance of LevelManager available globally
 window.LevelManager = new LevelManager();
 
 }());

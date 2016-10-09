@@ -18,16 +18,28 @@
  *      - global Obstacles object
  *    - animations.js
  */
+
+
+ // Returns a random integer in [left, right] assuming left <= right
+ function randomIntegerInRange(left, right) {
+   var small, large;
+   small = Math.min(left, right);
+   large = Math.max(left, right);
+
+   return Math.floor(Math.random() * ( large - small + 1)) + small;
+ }
+
+
 (function() {
 
-  // Returns a random integer in [left, right] assuming left <= right
-  function randomIntegerInRange(left, right) {
-    var small, large;
-    small = Math.min(left, right);
-    large = Math.max(left, right);
-
-    return Math.floor(Math.random() * ( large - small + 1)) + small;
-  }
+  // // Returns a random integer in [left, right] assuming left <= right
+  // function randomIntegerInRange(left, right) {
+  //   var small, large;
+  //   small = Math.min(left, right);
+  //   large = Math.max(left, right);
+  //
+  //   return Math.floor(Math.random() * ( large - small + 1)) + small;
+  // }
 
   /*
    * EnemyGenerator: Generates the enemies for each level.
@@ -137,8 +149,7 @@
     var column, rows, speeds, delays;
     column = -1;
     rows = [1, 2];
-    speeds = [4, 6];
-    delays = [100, 250, 500];
+    speeds = [1, 2];
 
     var self = this;
     // Generate future enemies
@@ -146,7 +157,7 @@
       var zombie = new Zombie(column, rows[randomIntegerInRange(0, 1)], speeds[randomIntegerInRange(0, 1)]);
       zombie.id = self.nextEnemyID++;
       allEnemies.push(zombie);
-    }, delays[randomIntegerInRange(0, 2)]);
+    }, 250);
   };
   EnemyGenerator.prototype._generateLevel4 = function() {
     // Create initial zombies
@@ -164,7 +175,7 @@
     rows    = [ 0,  0,  2,  2,  3,  3];
     columns = [-1, -1,  5,  5, -1, -1];
     speeds  = [ 2,  1, -2, -1,  2,  1];
-    delays  = [ 100, 250, 500];
+    //delays  = [ 100, 250, 500];
 
     this.generatorInterval = setInterval(function() {
       var randomIndex, zombie;
@@ -172,7 +183,7 @@
       zombie = new Zombie(columns[randIndex], rows[randIndex], speeds[randIndex]);
       zombie.id = self.nextEnemyID++;
       allEnemies.push(zombie);
-    }, delays[randomIntegerInRange(0, 2)]);
+    }, 500);
   };
   EnemyGenerator.prototype._generateLevel5 = function() {
     var spider1, spider2;
@@ -188,15 +199,15 @@
     allEnemies.push(spider);
 
     var speeds, delays;
-    speeds = [-0.8, -1.0];
-    delays = [2500, 2800];
+    speeds = [-1.0, -1.4];
+    //delays = [2500, 2800];
     this.generatorInterval = setInterval(function() {
       var randIndex, zombie;
       randIndex = randomIntegerInRange(0, 1);
       zombie = new Zombie(6, 2, speeds[randIndex]);
       zombie.id = self.nextEnemyID++;
       allEnemies.push(zombie);
-    }, delays[randomIntegerInRange(0, 1)]);
+    }, 2500);
   };
   EnemyGenerator.prototype._generateLevel7 = function() {
     // Create initial ghosts
@@ -214,14 +225,14 @@
     cols   = [ 6, -1, -1,  6];
     rows   = [ 1,  2,  3,  4];
     speeds = [-1,  1,  1, -1];
-    delays = [1000, 1500];
+
     this.generatorInterval = setInterval(function() {
       var randIndex, ghost;
       randIndex = randomIntegerInRange(0, 3);
       ghost = new Ghost(cols[randIndex], rows[randIndex], speeds[randIndex]);
       ghost.id = self.nextEnemyID++;
       allEnemies.push(ghost);
-    }, delays[randomIntegerInRange(0, 1)]);
+    }, 900);
   };
   EnemyGenerator.prototype._generateLevel8 = function() {
     var spider1, spider2, spider3, spider4;
@@ -257,7 +268,7 @@
       var ghost = new Ghost(col, rows[randomIntegerInRange(0, 3)], speeds[randomIntegerInRange(0, 2)]);
       ghost.id = self.nextEnemyID++;
       allEnemies.push(ghost);
-    }, 1300);
+    }, 1400);
   };
   EnemyGenerator.prototype._generateLevel10 = function() {
     // Spiders
@@ -321,8 +332,8 @@
     var spider1, spider2, spider3, spider4;
     spider1 = new Spider(0, 2, 2, MOVEMENT_DIRECTION.horizontal, [0, 4]);
     spider2 = new Spider(3, 2, 1.5, MOVEMENT_DIRECTION.vertical, [2, 4]);
-    spider3 = new Spider(4, 3, 1.5, MOVEMENT_DIRECTION.horizontal, [3, 4]);
-    spider4 = new Spider(3, 4, 1.5, MOVEMENT_DIRECTION.horizontal, [3, 4]);
+    spider3 = new Spider(4, 3, 2.0, MOVEMENT_DIRECTION.horizontal, [3, 4]);
+    spider4 = new Spider(3, 4, 2.0, MOVEMENT_DIRECTION.horizontal, [3, 4]);
     [spider1, spider2, spider3, spider4].forEach(function(spider) {
       spider.id = self.nextEnemyID++;
       allEnemies.push(spider);
@@ -418,13 +429,16 @@
     this._playerHasPickedUpLaserManCostume  = false;
     this._playerHasPickedUpGhostCostume     = false;
   };
+  BoardManager.prototype.restartCurrentLevel = function() {
+    this.beginCurrentLevel();
+  };
   BoardManager.prototype.beginCurrentLevel = function() {
     // Update level map for the new level
 
 
     // DEVELOPMENT CODE  ONLY
     // Used for quickly accessing specific levels
-    //this.currentLevel = 14;
+    //this.currentLevel = 7;
     // END DEVELOPMENT CODE ONLY
 
 
@@ -462,10 +476,9 @@
            location.y === rock.location.y ) {
 
              return player.canSmashRock(rock) ? true : false;
-           }
+      }
     }
 
-    // TODO: implement laser node testing
     // Prevent player from moving into a location occupied by a
     // laser node.
     var lasers, laser;
@@ -476,7 +489,7 @@
       if ( location.x === laser.locationLeftLaserNode && location.y === laser.y ||
             location.x === laser.locationRightLaserNode && location.y === laser.y ) {
               return false;
-            }
+      }
     }
 
     return true;
@@ -610,9 +623,18 @@
     levelFinishLocation = this.currentLevelMap.playerFinish;
     playerCompletedLevel = ( player.location.x === levelFinishLocation.x && player.location.y === levelFinishLocation.y );
     if ( playerCompletedLevel ) {
-      // TODO go to next level
-      console.log("PLAYER COMPLETED LEVEL");
-      this.beginNextLevel();
+      var lastLevel = 14;
+      //this.currentLevel < lastLevel ? this.beginNextLevel() : PopoverManager.presentGameFinishPopover();
+
+      if ( this.currentLevel < lastLevel ) {
+        this.beginNextLevel();
+      } else {
+        // Player has beat the game! Remove the game board from the DOM and present
+        // the final popover
+        var canvas = document.getElementById("game-board");
+        document.getElementById("container").removeChild(canvas);
+        PopoverManager.presentGameFinishPopover();
+      }
     }
   };
   BoardManager.prototype.updateCostumes = function(dt) {

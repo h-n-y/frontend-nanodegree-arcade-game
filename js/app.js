@@ -68,8 +68,8 @@ Entity.prototype._draw = function() {
 //  Begins the process of rendering the Entity's sprite onscreen.
 Entity.prototype.render = function() {
   this._draw();
-  // for debugging only
-  //this._renderCollisionBox();
+  // for development only
+  this._renderCollisionBox();
 }
 // Updates any data or properties associated with the Entity.
 // Initiated by the game loop and called continuously.
@@ -202,13 +202,13 @@ Enemy.prototype._updateCollisionBox = function() {
     break;
 
     case ENEMY_TYPE.spider:
-    width = 95;
+    width = 65;
     height = 60;
     verticalAdjustment = 55;
     break;
 
     case ENEMY_TYPE.ghost:
-    width = 70;
+    width = 55;
     height = 72;
     verticalAdjustment = 47;
     break;
@@ -276,10 +276,14 @@ Enemy.prototype.checkCollisions = function() {
 
   // Check if enemy has collided with player
   if ( this.isCollidingWithEntity(player) ) {
+    // Do nothing if enemy is a Ghost and player is wearing the Ghost costume
+    if ( this.type === ENEMY_TYPE.ghost && player._isGhost() ) return;
+
+
     this.isColliding = true;
 
     // Player dies: start level over
-    // TODO
+    BoardManager.restartCurrentLevel();
   }
 };
 
