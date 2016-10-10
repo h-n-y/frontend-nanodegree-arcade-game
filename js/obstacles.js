@@ -1,17 +1,11 @@
-// This file contains definitions for obstacles that in some way
-// impede Player or Enemy objects' movement across the board.
-//
-// Obstacle class constructors can be accessed globally through
-// the Obstacle object.
-//    (i.e. var myRock = new Obstacle.rock() )
-//
-// Summary:
-//  - Rock:   _solid_ impassable obstacle.
-//  - Web:    _sticky_ obstacle.
-//  - Laser:  _dangerous_ obstace.
-//
-// Dependencies: app.js
-//
+/** 
+ * @fileOverview Contains classes for obstacles that impede enemy and player objects' movement.
+ */
+
+/**
+ * @constant
+ * Colors for obstacles and costumes.
+ */
 var COLOR = {
   red:    "red",
   blue:   "blue",
@@ -19,6 +13,10 @@ var COLOR = {
   gray:   "gray",
 };
 
+/**
+ * @constant
+ * Obstacle types.
+ */
 var OBSTACLE_TYPE = {
   rock: "rock",
   web: "web",
@@ -27,11 +25,16 @@ var OBSTACLE_TYPE = {
 
 (function() {
 
-  /*
-   *  OBSTACLE: Represents an obstacle Enemy and Player instances generally
-   *  cannot pass through.
+  /**
+   * An obstacle enemy and player instances generally cannot pass through.
+   * @constructor
+   * @extends Entity
+   * @param {string} type - the type of obstacle
+   * @param {string} spriteURL - the sprite url for this obstacle
+   * @param {number} x - the horizontal position of this obstacle on the game board
+   * @param {number} y - the vertical position of this obstacle on the game board
    *
-   *  Class Hierarchy: Object > Entity > Obstacle
+   * @property {string} type - the type of obstacle
    */
   var Obstacle = function(type, spriteURL, x, y) {
     Entity.call(this, spriteURL, x, y);
@@ -40,14 +43,17 @@ var OBSTACLE_TYPE = {
   Obstacle.prototype = Object.create(Entity.prototype);
   Obstacle.prototype.constructor = Obstacle;
 
-  /*
-   *  ROCK: A solid obstacle through which Enemy and Player instances
-   *  cannot pass.
+
+  /**
+   * An impassable solid obstacle. Colored rocks <em>can</em> be broken by a Dwarf of the same color.
+   * @constructor
+   * @extends Obstacle
+   * @param {string} color - the rock color
+   * @param {number} x - the horizontal position of this rock on the game board
+   * @param {number} y - the vertical position of this rock on the game board
    *
-   *  Colored rocks ( red, blue, and yellow ) can be broken by a Dwarf
-   *  of the same color;
-   *
-   *  Class Hierarchy: Object > Entity > Obstacle > Rock
+   * @property {string} color - the rock color
+   * @property {Object} collisionBox - box surrounding this rock used for collision detection
    */
   var Rock = function(color, x, y) {
     var spriteURL;
@@ -89,6 +95,9 @@ var OBSTACLE_TYPE = {
   };
   Rock.prototype = Object.create(Obstacle.prototype);
   Rock.prototype.constructor = Rock;
+  /**
+   * Renders this rock to the screen
+   */
   Rock.prototype.render = function() {
     Entity.prototype.render.call(this);
 
@@ -101,6 +110,17 @@ var OBSTACLE_TYPE = {
    *
    *  Class Hierarchy: Object > Entity > Rock > JackoLantern
    *
+   */
+
+  /**
+   * A jack-o-lantern obstacle.
+   * @constructor
+   * @extends Rock
+   * @param {number} x - the horizontal position of this jack-o-lantern
+   * @param {number} y - the vertical position of this jack-o-lantern
+   *
+   * @property {string} spriteURL - the sprite url for this jack-o-lantern
+   * @property {Object} collisionBox - box surrounding this jack-o-lantern used for collision detection
    */
   var JackoLantern = function(x, y) {
     Rock.call(this, null, x, y);
@@ -117,23 +137,28 @@ var OBSTACLE_TYPE = {
   JackoLantern.prototype = Object.create(Rock.prototype);
   JackoLantern.prototype.constructor = JackoLantern;
 
-  /*
-   *  Skull: A skull-shaped obstacle.
+
+  /**
+   * A skull-shaped obstacle.
+   * @constructor
+   * @extends Rock
+   * @param {number} x - the horizontal position of this skull on the game board
+   * @param {number} y - the vertical position of this skull on the game board
    */
   var Skull = function(x, y) {
     Rock.call(this, null, x, y);
     this.spriteURL = 'images/skull.png';
-    // this.collisionBox = {
-    //
-    // };
   };
   Skull.prototype = Object.create(Rock.prototype);
   Skull.prototype.constructor = Skull;
 
-  /*
-   * WEB: A sticky obstacle that hampers Player's movement.
-   *
-   *  Class Hierarchy: Object > Entity > Obstacle > Web
+
+  /**
+   * A stick obstacle that hampers player's movement.
+   * @constructor
+   * @extends Obstacle
+   * @param {number} x - the horizontal position this web on the game board
+   * @param {number} y - the vetical position this web on the game board
    */
   var Web = function(x, y) {
     Obstacle.call(this, OBSTACLE_TYPE.web, 'images/web.png', x, y);
@@ -141,13 +166,22 @@ var OBSTACLE_TYPE = {
   Web.prototype = Object.create(Obstacle.prototype);
   Web.prototype.constructor = Web;
 
-  /*
-   * LASER: An obstacle that fires a horizontal laser beam between two
-   * laser nodes.
+
+  /**
+   * An obstacle that fires a horizontal laser beam between two laser nodes. Impassable unless player is wearing a LaserMan costume.
+   * @constructor
+   * @extends Obstacle
+   * @param {string} color - the laser beam color
+   * @param {number} locationLeft - the horizontal location of the left laser node
+   * @param {number} locationRight - the horizontal location of the right laser node
+   * @param {number} y - the vertical location of both laser nodes
    *
-   *  Impassable unless player is wearing the LASERMAN costume.
-   *
-   *  Class Hierarchy: Object > Entity > Obstacle > Laser
+   * @property {Object} beamColor - the name and color of the laser beam
+   * @property {number} locationLeftLaserNode - the horizontal location of the left laser node
+   * @property {number} locationRightLaserNode - the horizontal location of the right laser node
+   * @property {number} y - the vertical location of both laser nodes
+   * @property {Object} laserNodeCollisionBoxes - collision boxes for each of the two laser nodes
+   * @property {Object} laserBeamParticle - the animated laser particle
    */
   var Laser = function(color, locationLeft, locationRight, y) {
     // Intentionally omit arguments for spriteURL, x, y. These arguments
@@ -172,6 +206,9 @@ var OBSTACLE_TYPE = {
   };
   Laser.prototype = Object.create(Obstacle.prototype);
   Laser.prototype.constructor = Laser;
+  /**
+   * Sets up the laser's collision boxes.
+   */
   Laser.prototype._setLaserNodeCollisionBoxes = function() {
     var width, height, y, verticalAdjustment;
     width = 85;
@@ -198,6 +235,9 @@ var OBSTACLE_TYPE = {
       }
     };
   };
+  /**
+   * Initializes the laser beam particle
+   */
   Laser.prototype._setLaserBeamParticle = function() {
     var verticalAdjustment = SPRITE_Y_POSITION_ADJUST + 110;
 
@@ -212,6 +252,7 @@ var OBSTACLE_TYPE = {
       maxLeft: ( this.locationLeftLaserNode + 0.5 ) * CELL_WIDTH,
       maxRight: ( this.locationRightLaserNode + 0.5 ) * CELL_WIDTH,
       update: function(dt) {
+        // Animate the laser beam particle left and right
         var dx, maxDX, frequencyControl;
         maxDX = this.maxRight - this.maxLeft;
         frequencyControl = 50;
@@ -220,9 +261,15 @@ var OBSTACLE_TYPE = {
       }
     };
   };
+  /**
+   * Updates the laser beam particle.
+   */
   Laser.prototype.update = function(dt) {
     this.laserBeamParticle.update(dt);
   };
+  /**
+   * Renders the laser to the board.
+   */
   Laser.prototype.render = function() {
     if ( this.locationLeftLaserNode.x !== this.locationRightLaserNode.x ) {
       console.warn("WARNING: Laser's nodes are not on the same row - will not render.");
@@ -234,18 +281,26 @@ var OBSTACLE_TYPE = {
     // for development only
     //this._renderCollisionBox();
   };
+  /**
+   * Renders the laser beam to the screen.
+   */
   Laser.prototype._renderLaserBeam = function() {
     ctx.save();
 
+    // Get laser beam dimensions
     var laserBeamWidth, laserBeamHeight;
     laserBeamWidth = this.laserBeamParticle.width;
     laserBeamHeight = this.laserBeamParticle.height;
-    
+
+    // Draw laser beam
     ctx.fillStyle = this.laserBeamParticle.color;
     ctx.fillRect(this.laserBeamParticle.center.x - laserBeamWidth / 2, this.laserBeamParticle.center.y - laserBeamHeight / 2, laserBeamWidth, laserBeamHeight);
 
     ctx.restore();
   };
+  /**
+   * Renders the laser nodes to the screen.
+   */
   Laser.prototype._renderLaserNodes = function() {
 
     var x, y, verticalAdjustment;
@@ -262,6 +317,9 @@ var OBSTACLE_TYPE = {
     y = this.y * CELL_HEIGHT + verticalAdjustment;
     ctx.drawImage(Resources.get(this.SPRITE_URL_RIGHT_LASERNODE), x, y);
   };
+  /**
+   * Initializes the beam color.
+   */
   Laser.prototype._setBeamColor = function(color) {
     switch ( color ) {
       case COLOR.red:
@@ -281,6 +339,9 @@ var OBSTACLE_TYPE = {
       this.beamColor.rgb = "black";
     }
   };
+  /**
+   * Renders the laser's collision boxes. For development only.
+   */
   Laser.prototype._renderCollisionBox = function() {
     ctx.save();
     ctx.strokeStyle = "red";
@@ -301,10 +362,6 @@ var OBSTACLE_TYPE = {
 
     ctx.restore();
   };
-  // // Override Entity implementation
-  // Laser.prototype._collisionBoxIntersects = function(entity) {
-  //
-  // };
 
   // Allow global access to the Rock, Web, and Laser classes.
   window.Obstacles = {
