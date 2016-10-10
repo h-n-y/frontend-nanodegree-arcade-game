@@ -1,7 +1,11 @@
-// Dependencies:
-//  obstacles.js
-//    for COLOR
+/**
+ * @fileOverview Contains classes for costumes and other collectibles.
+ */
 
+/**
+ * @constant
+ * Costume types
+ */
 var COSTUME_TYPE = {
   laserman: "laserman",
   ghost: "ghost",
@@ -11,17 +15,17 @@ var COSTUME_TYPE = {
 
 (function() {
 
-  /*
-   *  _COLLECTIBLE: Base class for collectibles that can be picked up
-   *  by the player.
+  /**
+   * Base class for collectibles ( such as costumes and candy ) that can be picked up by the player.
+   * @constructor
+   * @extends Entity
+   * @param {string} type - the type of collectible
+   * @param {string} spriteURL - path to the sprite url for this collectible
+   * @param {number} x - horizontal location of this collectible on the game board
+   * @param {number} y - vertical location of this collectible on the game board
    *
-   *  Class Hierarchy: Object > Entity > _Collectible
-   *
-   *  Properties:
-   *    * originalYLocation: the starting y-position of the _Collectible.
-   *        _Collectibles float up and down and oscillate vertically about this
-   *        position.
-   *    * type: a string from the global COLLECTIBLE_TYPE object
+   * @property {string} type - the type of collectible
+   * @property {number} originalYLocation - the initial vertical position of this collectible on the game board: Collectible float up and down about this location.
    */
   var _Collectible = function(type, spriteURL, x, y) {
     Entity.call(this, spriteURL, x, y);
@@ -30,19 +34,23 @@ var COSTUME_TYPE = {
   };
   _Collectible.prototype = Object.create(Entity.prototype);
   _Collectible.prototype.constructor = _Collectible;
-  // Override Entity implementation
-  // Updates the vertical positioning of this _Collectible to make
-  // it appear to float up and down.
+  /**
+   * Update the vertical positioning of the collectible to make it float up and down.
+   * @param {number} dt - a time delta for updating this collectible
+   */
   _Collectible.prototype.update = function(dt) {
     var dy, maxDY, frequencyControl;
 
     // Use a sin function to oscillate dy from [-maxDY, maxDY]
-    // maxDY and frequencyControl were chosen subjectively
+    // maxDY and frequencyControl chosen subjectively
     maxDY = 0.1;
     frequencyControl = 800;
     dy = maxDY * Math.sin(Date.now() / frequencyControl);
     this.location.y = this.originalYLocation + dy;
   };
+  /**
+   * Render collectible to the screen.
+   */
   _Collectible.prototype.render = function() {
     var x, y;
     x = this.location.x * CELL_WIDTH;
@@ -51,10 +59,13 @@ var COSTUME_TYPE = {
     ctx.drawImage(Resources.get(this.spriteURL), x, y);
   };
 
-  /*
-   *  CANDY: Represents a piece of candy the player is trying to acquire.
-   *
-   *  Class Hierarchy: Object > Entity > _Collectible > Candy
+
+  /**
+   * The precious candy corn player is trying to find!
+   * @constructor
+   * @extends _Collectible
+   * @param {number} x - the horizontal position of the candy on the game board
+   * @param {number} y - the vertical position of the candy on the game board
    */
   var Candy = function(x, y) {
     _Collectible.call(this, "candy", 'images/candy-corn.png', x, y);
@@ -62,20 +73,17 @@ var COSTUME_TYPE = {
   Candy.prototype = Object.create(_Collectible.prototype);
   Candy.prototype.constructor = Candy;
 
-  /*
-   * LASERMAN: A collectible costume the player can adorn to become
-   *           invulnerable to laser beams of the same color!
-   *           Comes in three flavors:
-   *            - red
-   *            - blue
-   *            - yellow
+
+  /**
+   * The LaserMan costume.
+   * @constructor
+   * @extends _Collectible
+   * @param {string} color - the color of this LaserMan costume
+   * @param {number} x - the horizontal position of this costume on the board
+   * @param {number} y - the vertical position of this costume on the board
    *
-   *  Class Hierarchy: Object > Entity > _Collectible > LaserMan
-   *
-   *  Properties:
-   *    * color: the color of the costume
-   *        - LaserMan is only invulnerable to lasers of the same color
-   *    * spriteURL: the url string for the image representing Laserman
+   * @property {string} spriteURL - the sprite url for this costume
+   * @property {string} color - the color of this costume
    */
   var LaserMan = function(color, x, y) {
     var spriteURL = spriteURLForColor(color);
@@ -109,20 +117,17 @@ var COSTUME_TYPE = {
   LaserMan.prototype = Object.create(_Collectible.prototype);
   LaserMan.prototype.constructor = LaserMan;
 
-  /*
-   *  DWARF: A collectible costume that enables the player to smash
-   *        rocks of the same color!
-   *        Comes in three flavors:
-   *          - red
-   *          - blue
-   *          - yellow
+
+  /**
+   * The Dwarf costume
+   * @constructor
+   * @extends _Collectible
+   * @param {string} color - the color of this costume
+   * @param {number} x - the horizontal position of this costume on the game board
+   * @param {number} y - the vertical position of this costume on the game board
    *
-   *  Class Hierarchy: Object > Entity > _Collectible > Dwarf
-   *
-   *  Properties:
-   *    * color: the color of the costume
-   *        - Dwarf can only smash rocks of the same color
-   *    * spriteURL: a url string for the image representing a Dwarf
+   * @property {string} spriteURL - the sprite url for this costume
+   * @property {string} color - the color of this costume
    */
   var Dwarf = function(color, x, y) {
     var spriteURL = spriteURLForColor(color);
@@ -156,12 +161,15 @@ var COSTUME_TYPE = {
   Dwarf.prototype = Object.create(_Collectible.prototype);
   Dwarf.prototype.constructor = Dwarf;
 
-  /*
-   * GHOST: A collectible costume that lets the player walk in the spirit world!
-   *        - makes the user impervious to ghosts
+
+  /**
+   * The Ghost costume.
+   * @constructor
+   * @extends _Collectible
+   * @param {number} x - the horizontal position of this costume on the game board
+   * @param {number} y - the vertical position of this costume on the game board
    *
-   *  Parameters:
-   *    * spriteURL: a url string for the image representing a Ghost
+   * @property {string} spriteURL - the sprite url for this costume
    */
   var Ghost = function(x, y) {
     _Collectible.call(this, COSTUME_TYPE.ghost, 'images/ghost-costume.png', x, y);
