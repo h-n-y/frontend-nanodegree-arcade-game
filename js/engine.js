@@ -127,6 +127,9 @@ var Engine = /*(*/function(global) {
         });
     }
 
+    /*
+     * Updates the costumes on the board.
+     */
     function updateCollectibles(dt) {
       BoardManager.updateCostumes(dt);
     }
@@ -137,10 +140,16 @@ var Engine = /*(*/function(global) {
       AnimationQueue.update(dt);
     }
 
+    /*
+     * Condtionally updates any popovers on the screen.
+     */
     function updatePopover(dt) {
       window.PopoverManager.update(dt);
     }
 
+    /*
+     * Checks for any collisions involving enemies
+     */
     function checkCollisions() {
       BoardManager.checkEnemyCollisions();
     }
@@ -158,6 +167,9 @@ var Engine = /*(*/function(global) {
         renderPopover();
     }
 
+    /*
+     * Renders the board to the screen.
+     */
     function renderBoard() {
       BoardManager.renderBoard();
     }
@@ -183,6 +195,9 @@ var Engine = /*(*/function(global) {
         player.render();
     }
 
+    /*
+     * Renders a popover to the screen.
+     */
     function renderPopover() {
       PopoverManager.render();
     }
