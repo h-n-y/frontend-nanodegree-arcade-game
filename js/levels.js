@@ -1,8 +1,18 @@
+/**
+ * @fileOverview LevelManager class to provide level layout information.
+ */
 (function() {
 
+/**
+ * Provides layout information for all levels.
+ */
 var LevelManager = function() {
 
 };
+/**
+ * @param {number} level - the level number
+ * @returns {Object} the level layout for <tt>level</tt>
+ */
 LevelManager.prototype.levelMapForLevel = function(level) {
   var levelMap;
 
