@@ -1,5 +1,13 @@
+/**
+ * @fileOverview PopoverManager class for displaying game start, game end, and costume popovers.
+ */
+
 (function() {
 
+/**
+ * @constant
+ * Color scheme used in popovers.
+ */
 var POPOVER_COLORS = {
   blueGray: "rgb(71, 70, 81)",
   gray: "rgb(186, 186, 186)",
@@ -7,37 +15,50 @@ var POPOVER_COLORS = {
   green: "rgb(171, 252, 170)"
 };
 
+/**
+ * Manages the presentation of game start, game finish, and costume popovers.
+ * @constructor
+ *
+ * @property {CanvasRenderingContext2D} ctx - the context for the currently presented popover
+ * @property {Object} costumeData - meta data to display for a costume popover
+ * @property {Object} fireworks - fireworks particles to animate inside the end-of-game popover
+ */
 var PopoverManager = function() {
   var ctx = null;
 };
+/**
+ * Presents the start-of-game popover. Introduces Jack and the premise of the game.
+ */
 PopoverManager.prototype.showGameStartPopover = function() {
   this._addCanvasToDOMWithID("game-start-popover");
   this.costumeData = {};
+
   // Set canvas dimensions
   this.ctx.canvas.width = 720;
   this.ctx.canvas.height = 600;
   var horizontalCenter = this.ctx.canvas.width / 2;
 
+  // Set styling
   this.ctx.font = "32pt Amatic SC";
   this.ctx.textAlign = "center";
+
   // Add dark blue-gray background
   this.ctx.fillStyle = POPOVER_COLORS.blueGray;
   this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
+  // Add text
   this.ctx.fillStyle = POPOVER_COLORS.gray;
   this.ctx.fillText("This is Jack:", horizontalCenter, 80);
-
   this.ctx.fillText("Help Jack find the", horizontalCenter, 300);
   this.ctx.fillStyle = POPOVER_COLORS.orange;
   this.ctx.fillText("CANDYCORN", horizontalCenter, 350);
   this.ctx.fillStyle = POPOVER_COLORS.gray;
   this.ctx.fillText("he dropped while", horizontalCenter, 390);
   this.ctx.fillText("trick-or-treating!", horizontalCenter, 430);
-
   this.ctx.font = "24pt Amatic SC";
   this.ctx.fillText("[ space ] to continue", horizontalCenter, 560);
 
-  // Add orange text
+  // Add orange (highlighted) text
   this.ctx.fillStyle = POPOVER_COLORS.orange;
   this.ctx.font = "32pt Amatic SC";
   this.ctx.fillText("Jack", horizontalCenter + 36, 80);
@@ -47,12 +68,18 @@ PopoverManager.prototype.showGameStartPopover = function() {
   // Add image of Jack
   this.ctx.drawImage(Resources.get('images/jack.png'), horizontalCenter - 51, 60);
 };
+/**
+ * Presents the end-of-game popover. Displays "Happy Halloween" and fireworks.
+ */
 PopoverManager.prototype.presentGameFinishPopover = function() {
   this._addCanvasToDOMWithID("game-end-popover");
   this._setFireworks();
 
   this._renderEndOfGamePopover();
 };
+/**
+ * Renders the end-of-game popover to the canvas.
+ */
 PopoverManager.prototype._renderEndOfGamePopover = function() {
   // Clear canvas
   this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
@@ -75,6 +102,9 @@ PopoverManager.prototype._renderEndOfGamePopover = function() {
   // Render fireworks
   this._renderFireworks();
 };
+/**
+ * Initialize the fireworks property.
+ */
 PopoverManager.prototype._setFireworks = function() {
   var canvas, colors;
   canvas = this.ctx.canvas;
@@ -168,10 +198,15 @@ PopoverManager.prototype._setFireworks = function() {
     }
   };
 };
+/**
+ * Adds a new popover canvas to the DOM.
+ * @param {string} id - the id of the popover canvas
+ */
 PopoverManager.prototype._addCanvasToDOMWithID = function(id) {
   // Create new canvas
   var popover = document.createElement('canvas');
   popover.id = id;
+
   // Add canvas to DOM
   document.getElementById("container").appendChild(popover);
   this.ctx = popover.getContext('2d');
@@ -183,22 +218,30 @@ PopoverManager.prototype._addCanvasToDOMWithID = function(id) {
     popover.height = window.ctx.canvas.height;
   }
 };
-// PopoverManager.prototype._removeCanvasFromDOM = function() {
-//   var canvas = document.getElementById("popover");
-//   document.body.removeChild(canvas);
-// };
+/**
+ * Presents the LaserMan costume popover.
+ */
 PopoverManager.prototype.presentLaserManPopover = function() {
   this._addCanvasToDOMWithID("costume-popover");
   this._setCostumeDataForCostume(COSTUME_TYPE.laserman);
 };
+/**
+ * Presents the Dwarf costume popover.
+ */
 PopoverManager.prototype.presentDwarfPopover = function() {
   this._addCanvasToDOMWithID("costume-popover");
   this._setCostumeDataForCostume(COSTUME_TYPE.dwarf);
 };
+/**
+ * Presents the Ghost costume popover.
+ */
 PopoverManager.prototype.presentGhostPopover = function() {
   this._addCanvasToDOMWithID("costume-popover");
   this._setCostumeDataForCostume(COSTUME_TYPE.ghost);
 };
+/**
+ * Removes the currently presented popover from the DOM.
+ */
 PopoverManager.prototype.removePopover = function() {
   if ( this.ctx === null ) return;
 
@@ -207,6 +250,10 @@ PopoverManager.prototype.removePopover = function() {
   canvasContainer.removeChild(this.ctx.canvas);
   this.ctx = null;
 };
+/**
+ * Updates the currently presented popover.
+ * @param {number} dt - a time delta for updating the currently presented popover
+ */
 PopoverManager.prototype.update = function(dt) {
   if ( this._isDisplayingCostumePopover() ) {
     this.costumeData.update();
@@ -220,25 +267,30 @@ PopoverManager.prototype._updateFireworks = function(dt) {
       this.fireworks[particle].update(dt);
     }
   }
-  //this.fireworks.particle1.update(dt);
-  // this.fireworks.particle2.update(dt);
-  // this.fireworks.particle3.update(dt);
 }
+/**
+ * Renders the currently displayed popover to the screen.
+ */
 PopoverManager.prototype.render = function() {
   if ( this._isDisplayingCostumePopover() ) {
     this._renderCostumePopover();
   } else if ( this._isDisplayingEndOfGamePopover() ) {
-    //this._renderFireworks();
     this._renderEndOfGamePopover();
   }
 };
+/**
+ * Renders fireworks for the displayed end-of-game popover.
+ */
 PopoverManager.prototype._renderFireworks = function() {
 
   var particle;
 
   for ( var key in this.fireworks ) {
     if ( this.fireworks.hasOwnProperty(key) ) {
+      // Get fireworks particle
       particle = this.fireworks[key];
+
+      // Draw particle
       this.ctx.strokeStyle = particle.color.replace("%alpha%", particle.alpha);
       this.ctx.lineWidth = particle.lineWidth;
       this.ctx.beginPath();
@@ -247,6 +299,9 @@ PopoverManager.prototype._renderFireworks = function() {
     }
   }
 };
+/**
+ * Renders the currently presented costume popover.
+ */
 PopoverManager.prototype._renderCostumePopover = function() {
   // Prevent window from scrolling down when this popover is added to the DOM
   window.scrollTo(0, 0);
@@ -267,12 +322,11 @@ PopoverManager.prototype._renderCostumePopover = function() {
   // Add background
   this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
+  // Add text
   this.ctx.fillStyle = POPOVER_COLORS.orange;
   this.ctx.fillText(this.costumeData.costume, horizontalCenter, 0.1 * canvasHeight);
   this.ctx.fillStyle = "white";
   this.ctx.fillText(this.costumeData.caption, horizontalCenter, 0.7 * canvasHeight);
-
-
   this.ctx.font = "24pt Amatic SC";
   this.ctx.fillStyle = POPOVER_COLORS.gray;
   this.ctx.fillText("COSTUME", horizontalCenter, 0.2 * canvasHeight);
@@ -280,20 +334,26 @@ PopoverManager.prototype._renderCostumePopover = function() {
   this.ctx.fillStyle = "orange";
   this.ctx.fillText("space", horizontalCenter - 54, 0.9 * canvasHeight);
 
-
-
   // Draw image
   this.costumeData.originalImageYLocation = 0.25 * canvasHeight;
-  //this.costumeData.imageLocation.y = this.costumeData.originalImageYLocation;
   this.ctx.drawImage(Resources.get(this.costumeData.spriteURL), horizontalCenter - 51, this.costumeData.imageLocation.y);
 };
+/**
+ * @returns {boolean} true iff costume popover is currently being displayed
+ */
 PopoverManager.prototype._isDisplayingCostumePopover = function() {
   return this.ctx !== null && this.ctx.canvas.id === "costume-popover";
-  //return this.costumeData !== null || this.costumeData !== undefined;
 };
+/**
+ * @returns {boolean} true iff end-of-game popover is currently being displayed
+ */
 PopoverManager.prototype._isDisplayingEndOfGamePopover = function() {
   return this.ctx !== null && this.ctx.canvas.id === "game-end-popover";
 };
+/**
+ * Initializes <tt>costumeData</tt> property.
+ * @param {string} costume - the type of costume
+ */
 PopoverManager.prototype._setCostumeDataForCostume = function(costume) {
   switch ( costume ) {
     case COSTUME_TYPE.dwarf:
