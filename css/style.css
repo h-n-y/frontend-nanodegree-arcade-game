@@ -8,6 +8,7 @@ canvas {
   display: block;
   margin: 0 auto;
 }
+
 #game-start-popover,
 #game-end-popover {
   position: absolute;
@@ -15,6 +16,7 @@ canvas {
   left: 0;
   right: 0;
 }
+
 #costume-popover {
   position: relative;
   /*top: 0;

@@ -108,7 +108,7 @@ PopoverManager.prototype._renderEndOfGamePopover = function() {
 PopoverManager.prototype._setFireworks = function() {
   var canvas, colors;
   canvas = this.ctx.canvas;
-  colors = ["white", POPOVER_COLORS.orange, POPOVER_COLORS.green]
+  colors = ["white", POPOVER_COLORS.orange, POPOVER_COLORS.green];
   colors = ["rgba(255, 255, 255, %alpha%)", "rgba(255, 184, 6, %alpha%)", "rgba(171, 252, 170, %alpha%)"];
 
   this.fireworks = {
@@ -244,7 +244,7 @@ PopoverManager.prototype.presentGhostPopover = function() {
  */
 PopoverManager.prototype.removePopover = function() {
   if ( this.ctx === null ) return;
-  // Do not dismiss the end-of-game popover 
+  // Do not dismiss the end-of-game popover
   if ( this.ctx.canvas.id === "game-end-popover" ) return;
 
   // Remove canvas here
@@ -269,7 +269,7 @@ PopoverManager.prototype._updateFireworks = function(dt) {
       this.fireworks[particle].update(dt);
     }
   }
-}
+};
 /**
  * Renders the currently displayed popover to the screen.
  */
@@ -318,7 +318,7 @@ PopoverManager.prototype._renderCostumePopover = function() {
 
   // Set initial styles
   this.ctx.fillStyle = "rgba(71, 70, 81, 0.9)";
-  this.ctx.textAlign = "center"
+  this.ctx.textAlign = "center";
   this.ctx.font = "32pt Amatic SC";
 
   // Add background
@@ -399,7 +399,7 @@ PopoverManager.prototype._setCostumeDataForCostume = function(costume) {
   this.costumeData.imageLocation = {
     x: this.ctx.canvas.width / 2 - 51,
     y: 60
-  }
+  };
   this.costumeData.originalImageYLocation = 60;
 };
 

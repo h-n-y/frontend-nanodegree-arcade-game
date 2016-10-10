@@ -292,7 +292,7 @@
           this.rotation += 2 * Math.PI * ds;
         }
       }
-    }
+    };
   };
   LaserShield.prototype = Object.create(Animation.prototype);
   LaserShield.prototype.constructor = LaserShield;
@@ -425,7 +425,7 @@
           }
         }
       }
-    }
+    };
   };
   WebStruggle.prototype = Object.create(Animation.prototype);
   WebStruggle.prototype.constructor = WebStruggle;

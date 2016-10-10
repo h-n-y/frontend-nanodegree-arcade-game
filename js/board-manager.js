@@ -498,7 +498,7 @@
    * @returns {boolean} true iff player is able to occupy the proposed location
    */
   BoardManager.prototype.playerCanOccupyLocation = function(location) {
-    var allObstacles, rocks, lasers;
+    var allObstacles;
 
     // Get all obstacles for this level
     allObstacles = this.currentObstacleLayout;
@@ -521,7 +521,7 @@
     // laser node.
     var lasers, laser;
     lasers = this.laserObstacles();
-    for ( var i = 0; i < lasers.length; ++i ) {
+    for ( i = 0; i < lasers.length; ++i ) {
       laser = lasers[i];
 
       if ( location.x === laser.locationLeftLaserNode && location.y === laser.y ||
@@ -727,7 +727,7 @@
     return {
       numRows: this.currentLevelMap.numRows,
       numCols: this.currentLevelMap.numCols
-    }
+    };
   };
   /**
    * Renders the board to the screen
@@ -752,7 +752,7 @@
         ctx.drawImage(Resources.get(rowImageURLs[row]), col * CELL_WIDTH, row * CELL_HEIGHT);
       }
     }
-  }
+  };
   /**
    * Renders the level finish marker to the screen.
    */
@@ -772,7 +772,7 @@
     this.currentLevelMap.obstacleLayout.forEach(function(obstacle) {
       obstacle.render();
     });
-  }
+  };
   /**
    * Renders costumes to the screen.
    */
@@ -814,7 +814,7 @@
 
       return obstacle.location.x === location.x && obstacle.location.y === location.y;
     });
-  }
+  };
   /**
    * @param {number} levelNum - the level number
    * @returns {Object} the level map for the level given by <tt>levelNum</tt>

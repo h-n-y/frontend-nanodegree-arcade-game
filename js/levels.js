@@ -39,7 +39,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
       ],
       obstacleLayout: [],
       costumeLayout: []
-    }
+    };
     break;
 
     // Zombies bouncing off rocks
@@ -68,7 +68,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
         new Obstacles.rock(COLOR.gray, 3, 2),
       ],
       costumeLayout: []
-    }
+    };
     break;
 
     // Zombie Apocalypse
@@ -104,7 +104,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
       costumeLayout: [
         new Costume.dwarf(COLOR.red, 4, 4)
       ]
-    }
+    };
     break;
 
     // More rock smashing with the Dwarf
@@ -139,7 +139,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
       costumeLayout: [
         new Costume.dwarf(COLOR.red, 4, 4)
       ]
-    }
+    };
     break;
 
     // Jack-o-Lanterns and Skulls
@@ -197,7 +197,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
         new Obstacles.web(4, 4),
       ],
       costumeLayout: []
-    }
+    };
     break;
 
     // Hello Spiders
@@ -243,7 +243,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
         new Costume.dwarf(COLOR.red, 0, 3),
         new Costume.dwarf(COLOR.yellow, 5, 5),
       ]
-    }
+    };
     break;
 
     // Ghosts
@@ -285,7 +285,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
         new Obstacles.jackolantern(3, 4),
       ],
       costumeLayout: []
-    }
+    };
     break;
 
     // Intro to LaserMan
@@ -335,7 +335,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
         new Costume.laserman(COLOR.blue, 0, 2),
         new Costume.laserman(COLOR.blue, 6, 2),
       ]
-    }
+    };
     break;
 
     // Lasers
@@ -385,7 +385,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
         new Costume.laserman(COLOR.blue, 3, 2),
         new Costume.laserman(COLOR.red, 6, 5),
       ]
-    }
+    };
     break;
 
     // LaserMan, Dwarf, Zombies, Spiders, Ghosts
@@ -439,7 +439,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
         new Costume.laserman(COLOR.yellow, 1, 1),
         new Costume.dwarf(COLOR.blue, 5, 6),
       ]
-    }
+    };
     break;
 
     // Intro: Ghost Costume
@@ -489,7 +489,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
       costumeLayout: [
         new Costume.ghost(5, 1)
       ]
-    }
+    };
     break;
 
     // All costumes
@@ -552,7 +552,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
         new Costume.ghost(1, 4),
         new Costume.dwarf(COLOR.blue, 1, 0),
       ]
-    }
+    };
     break;
 
     // Arachnophobia ??
@@ -639,7 +639,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
       costumeLayout: [
         new Costume.laserman(COLOR.red, 3, 6)
       ]
-    }
+    };
     break;
 
     // Candy: Final Level
@@ -713,7 +713,7 @@ LevelManager.prototype.levelMapForLevel = function(level) {
 
         new Costume.laserman(COLOR.red, 0, 6)
       ]
-    }
+    };
     break;
 
     default:

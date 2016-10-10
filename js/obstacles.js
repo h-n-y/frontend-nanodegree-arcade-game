@@ -1,4 +1,4 @@
-/** 
+/**
  * @fileOverview Contains classes for obstacles that impede enemy and player objects' movement.
  */
 
@@ -199,9 +199,9 @@ var OBSTACLE_TYPE = {
     this.y = y;
     this.SPRITE_URL_LEFT_LASERNODE = 'images/laser-left.png';
     this.SPRITE_URL_RIGHT_LASERNODE = 'images/laser-right.png';
-    this.laserNodeCollisionBoxes;
+    this.laserNodeCollisionBoxes = {};
     this._setLaserNodeCollisionBoxes();
-    this.laserBeamParticle;
+    this.laserBeamParticle = {};
     this._setLaserBeamParticle();
   };
   Laser.prototype = Object.create(Obstacle.prototype);

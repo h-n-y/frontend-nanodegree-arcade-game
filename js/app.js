@@ -68,7 +68,7 @@ var Entity = function(spriteURL, x, y) {
     }
   };
   this.isColliding = false;
-}
+};
 /**
  * Called by <tt>Entity.render</tt> to do the actual work of drawing the <tt>Entity</tt>'s sprite onscreen.
  */
@@ -79,20 +79,20 @@ Entity.prototype._draw = function() {
 
   // draw sprite to canvas
   ctx.drawImage(Resources.get(this.spriteURL), x, y);
-}
+};
 /** Renders the <tt>Entity</tt>'s sprite onscreen */
 Entity.prototype.render = function() {
   this._draw();
   // for development only
   //this._renderCollisionBox();
-}
+};
 /**
  * Updates any data or properties - called continuously by the game loop.
  * Default functionality is to do nothing - subclasses override this method.
  */
 Entity.prototype.update = function(dt) {
   // noop
-}
+};
 /**
  * @returns {boolean} <tt>true</tt> iff this <tt>Entity</tt> is colliding with another <tt>Entity</tt>
  */
@@ -203,7 +203,7 @@ var Enemy = function(type, x, y, speed) {
   this.spriteURL = spriteURL;
   this.type = type;
   this.currentSpeed = speed;
-  this.id;
+  this.id = 0;
 };
 Enemy.prototype = Object.create(Entity.prototype);
 Enemy.prototype.constructor = Enemy;
@@ -492,7 +492,7 @@ Ghost.prototype._movingLeft = function() {
  * Updates ghost's location and attack mode.
  */
 Ghost.prototype.update = function(dt) {
-  Enemy.prototype.update.call(this, dt)
+  Enemy.prototype.update.call(this, dt);
 
   this._updateAttackMode();
 };
@@ -543,7 +543,7 @@ var Player = function(spriteURL, x, y) {
     caughtInWeb: false,
     hasAttemptedToMove: false
   };
-  this.collisionBox;
+  this.collisionBox = {};
   this._updateCollisionBox();
 };
 Player.prototype = Object.create(Entity.prototype);
@@ -598,7 +598,7 @@ Player.prototype._draw = function() {
 
   // Check if player is a Ghost
   if ( this._isGhost() ) {
-    var spriteURL = 'images/ghost-costume.png'
+    var spriteURL = 'images/ghost-costume.png';
     ctx.drawImage(Resources.get(spriteURL), x, y);
   }
 
