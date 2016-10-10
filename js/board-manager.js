@@ -656,20 +656,31 @@
       var laser = obstacle;
 
       var playerInvulnerableToLaser = ( player._isLaserMan() && player._laserManCostume().color ===  laser.beamColor.name );
-      if ( playerInvulnerableToLaser/* && !player.laserShieldIsOn*/ ) {
+      if ( playerInvulnerableToLaser ) {
         // Start laser shield animation around player
         player.endLaserShieldAnimation();
         player.startLaserShieldAnimation();
+      } else {
+        // Player is vulnerable to laser and dies. Start level over.
+        this.showPlayerCollisionAnimation();
+        this.restartCurrentLevel();
       }
-
-      // Player is vulnerable to laser and dies. Start level over.
-      // TODO
     }
 
     function handleWebCollision() {
       player.webStatus.caughtInWeb = true;
       player.webStatus.hasAttemptedToMove = false;
     }
+  };
+  /**
+   * Performs a collision animation at the player's current location. Called after the player has
+   * collided with a laser beam or an enemy.
+   */
+  BoardManager.prototype.showPlayerCollisionAnimation = function() {
+    // NOTE
+    // The web struggle animation is repurposed here for player collisions.
+    var collisionAnimation = new Animation.webStruggle(player.location.x, player.location.y);
+    AnimationQueue.addAnimation(collisionAnimation);
   };
   /**
    * Checks if player has completed the level.

@@ -84,7 +84,7 @@ Entity.prototype._draw = function() {
 Entity.prototype.render = function() {
   this._draw();
   // for development only
-  this._renderCollisionBox();
+  //this._renderCollisionBox();
 }
 /**
  * Updates any data or properties - called continuously by the game loop.
@@ -321,6 +321,7 @@ Enemy.prototype.checkCollisions = function() {
     this.isColliding = true;
 
     // Player dies: start level over
+    BoardManager.showPlayerCollisionAnimation();
     BoardManager.restartCurrentLevel();
   }
 };

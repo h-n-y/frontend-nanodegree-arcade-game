@@ -244,6 +244,8 @@ PopoverManager.prototype.presentGhostPopover = function() {
  */
 PopoverManager.prototype.removePopover = function() {
   if ( this.ctx === null ) return;
+  // Do not dismiss the end-of-game popover 
+  if ( this.ctx.canvas.id === "game-end-popover" ) return;
 
   // Remove canvas here
   var canvasContainer = document.getElementById("container");
