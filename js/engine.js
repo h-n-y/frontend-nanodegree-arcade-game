@@ -260,7 +260,7 @@ var Engine = /*(*/function(global) {
         'images/zombie.png',
 
         // Level finish
-        'images/selector.png',
+        'images/Selector.png',
 
         'images/candy-corn.png',
     ]);
