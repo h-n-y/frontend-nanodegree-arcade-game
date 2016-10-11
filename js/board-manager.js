@@ -761,7 +761,7 @@
     row = this.currentLevelMap.playerFinish.y;
     col = this.currentLevelMap.playerFinish.x;
 
-    ctx.drawImage(Resources.get('images/selector.png'), col * CELL_WIDTH, row * CELL_HEIGHT - 40);
+    ctx.drawImage(Resources.get('images/Selector.png'), col * CELL_WIDTH, row * CELL_HEIGHT - 40);
   };
   /**
    * Renders obstacles to the screen.
