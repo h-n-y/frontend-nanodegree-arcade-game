@@ -62,8 +62,6 @@ PopoverManager.prototype.showGameStartPopover = function() {
   this.ctx.fillStyle = POPOVER_COLORS.orange;
   this.ctx.font = "32pt Amatic SC";
   this.ctx.fillText("Jack", horizontalCenter + 36, 80);
-  this.ctx.font = "24pt Amatic SC";
-  this.ctx.fillText("space", horizontalCenter - 54, 560);
 
   // Add image of Jack
   this.ctx.drawImage(Resources.get('images/jack.png'), horizontalCenter - 51, 60);
