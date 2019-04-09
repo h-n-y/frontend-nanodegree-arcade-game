@@ -362,7 +362,7 @@ PopoverManager.prototype._setCostumeDataForCostume = function(costume) {
     this.costumeData = {
       costume: "DWARF",
       spriteURL: 'images/dwarf-red.png',
-      caption: "Rocks were meant for smashing.",
+      caption: "Rocks were made for smashing.",
     };
     break;
 
