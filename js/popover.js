@@ -206,7 +206,9 @@ PopoverManager.prototype._addCanvasToDOMWithID = function(id) {
   popover.id = id;
 
   // Add canvas to DOM
-  document.getElementById("container").appendChild(popover);
+  const popoverWrapper = document.getElementById('popover-wrapper');
+  popoverWrapper.appendChild(popover);
+  popoverWrapper.classList.add('visible');
   this.ctx = popover.getContext('2d');
 
   // If canvas is displaying a costume popover, set its width and
@@ -246,8 +248,9 @@ PopoverManager.prototype.removePopover = function() {
   if ( this.ctx.canvas.id === "game-end-popover" ) return;
 
   // Remove canvas here
-  var canvasContainer = document.getElementById("container");
-  canvasContainer.removeChild(this.ctx.canvas);
+  var popoverWrapper = document.getElementById("popover-wrapper");
+  popoverWrapper.removeChild(this.ctx.canvas);
+  popoverWrapper.classList.remove('visible');
   this.ctx = null;
 };
 /**
@@ -303,9 +306,6 @@ PopoverManager.prototype._renderFireworks = function() {
  * Renders the currently presented costume popover.
  */
 PopoverManager.prototype._renderCostumePopover = function() {
-  // Prevent window from scrolling down when this popover is added to the DOM
-  window.scrollTo(0, 0);
-  this.ctx.canvas.style.top = (-window.ctx.canvas.height).toString() + "px";
 
   var horizontalCenter, canvasHeight;
   horizontalCenter = this.ctx.canvas.width / 2;
@@ -315,12 +315,8 @@ PopoverManager.prototype._renderCostumePopover = function() {
   this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
   // Set initial styles
-  this.ctx.fillStyle = "rgba(71, 70, 81, 0.9)";
   this.ctx.textAlign = "center";
   this.ctx.font = "32pt Amatic SC";
-
-  // Add background
-  this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
   // Add text
   this.ctx.fillStyle = POPOVER_COLORS.orange;

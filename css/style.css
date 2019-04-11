@@ -4,23 +4,38 @@ body {
     background-color: #474651;
 }
 
+#container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 500px;
+    overflow-y: auto;
+}
+
 canvas {
   display: block;
   margin: 0 auto;
 }
 
-#game-start-popover,
-#game-end-popover {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+/**
+ * POPOVER WRAPPER
+ */
+#popover-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 100;
+    width: 100vw;
+    height: 100vh;
+    min-width: 500px;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-#costume-popover {
-  position: relative;
-  /*top: 0;
-  left: 0;
-  right: 0;*/
-  /*background-color: rgba(0, 255, 180, 0.5);*/
+#popover-wrapper.visible {
+    background-color: rgba(71, 70, 81, 0.9);
 }
