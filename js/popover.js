@@ -327,8 +327,6 @@ PopoverManager.prototype._renderCostumePopover = function() {
   this.ctx.fillStyle = POPOVER_COLORS.gray;
   this.ctx.fillText("COSTUME", horizontalCenter, 0.2 * canvasHeight);
   this.ctx.fillText("[ space ] to continue", horizontalCenter, 0.9 * canvasHeight);
-  this.ctx.fillStyle = "orange";
-  this.ctx.fillText("space", horizontalCenter - 54, 0.9 * canvasHeight);
 
   // Draw image
   this.costumeData.originalImageYLocation = 0.25 * canvasHeight;
