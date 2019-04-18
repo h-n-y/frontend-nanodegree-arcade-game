@@ -1,6 +1,6 @@
 # Trick-or-Treat
 
-Help Jack find the candy corn he lost while trick-or-treating! Created for a course I took with [Udacity](http://www.udacity.com).
+[Help Jack](https://h-n-y.github.io/trick-or-treat) find the candy corn he lost while trick-or-treating! Created for a course I took with [Udacity](http://www.udacity.com).
 ___
 
 ## Setup  
