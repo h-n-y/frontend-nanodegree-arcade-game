@@ -122,7 +122,7 @@ var Engine = /*(*/function(global) {
         if ( player ) {
             player.update();
         } else {
-            console.warn('Wait for player to initialize');
+            console.log('Wait for player to initialize');
         }
 
         // Update laser obstacles
