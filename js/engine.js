@@ -119,7 +119,11 @@ var Engine = /*(*/function(global) {
         });
 
         // Update player
-        player.update();
+        if ( player ) {
+            player.update();
+        } else {
+            console.warn('Wait for player to initialize');
+        }
 
         // Update laser obstacles
         BoardManager.laserObstacles().forEach(function(laser) {
@@ -192,7 +196,11 @@ var Engine = /*(*/function(global) {
             enemy.render();
         });
 
-        player.render();
+        if ( player ) {
+            player.render();
+        } else {
+            console.log('Wait for player to initialize');
+        }
     }
 
     /*
